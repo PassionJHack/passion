@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<style>
+      html, body, #map-canvas {
+        height: 100%;
+        margin: 0px;
+        padding: 0px
+      }
+      .controls {
+        margin-top: 16px;
+        border: 1px solid transparent;
+        border-radius: 2px 0 0 2px;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        height: 32px;
+        outline: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      }
+
+      #pac-input {
+        background-color: #fff;
+        padding: 0 11px 0 13px;
+        width: 400px;
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+        text-overflow: ellipsis;
+      }
+
+      #pac-input:focus {
+        border-color: #4d90fe;
+        margin-left: -1px;
+        padding-left: 14px;  /* Regular padding-left + 1. */
+        width: 401px;
+      }
+
+      .pac-container {
+        font-family: Roboto;
+      }
+
+      #type-selector {
+        color: #fff;
+        background-color: #4d90fe;
+        padding: 5px 11px 0px 11px;
+      }
+
+      #type-selector label {
+        font-family: Roboto;
+        font-size: 13px;
+        font-weight: 300;
+      }
+}
+
+    </style>
+    <object
+    id="Tizen"
+    type="application/x-tizen-jsbridge"
+    width="0"
+    height="0"></object>
+    
+        <script
+        src="http://maps.googleapis.com/maps/api/js?v=3.wxp&libraries=places"></script>
+            <meta
+            name="viewport"
+            content="initial-scale=1.0, user-scalable=no">
+                <script>
+                    var myCenter = new google.maps.LatLng(37, 126);
+                    var marker;
+					var cur_marker;
+                    var map;
+                    var startpt;
+                    var endpt;
+                    var directionsDisplay;
+                    var directionsService = new google.maps.DirectionsService();
+                    var jsonData;
+                    var jsonString;
+                    var jsonText;
+                    var lat;
+                    var lng;
+                    
+                    var input = /** @type {HTMLInputElement} */(document.getElementById('pac-input'));
+                    var searchBox = new google.maps.places.SearchBox(input);
+                    
+                   google.maps.event.addListener(searchBox, 'places_changed', function() {
+				    var places = searchBox.getPlaces();
+				
+				    if (places.length == 0) {
+				      return;
+				    }
+				    for (var i = 0, marker; marker = markers[i]; i++) {
+				      marker.setMap(null);
+				    }
+				
+				    // For each place, get the icon, place name, and location.
+				    markers = [];
+				    var bounds = new google.maps.LatLngBounds();
+				    for (var i = 0, place; place = places[i]; i++) {
+				      var image = {
+				        url: place.icon,
+				        size: new google.maps.Size(71, 71),
+				        origin: new google.maps.Point(0, 0),
+				        anchor: new google.maps.Point(17, 34),
+				        scaledSize: new google.maps.Size(25, 25)
+				      };
+				
+				      // Create a marker for each place.
+				      var marker = new google.maps.Marker({
+				        map: map,
+				        icon: image,
+				        title: place.name,
+				        position: place.geometry.location
+				      });
+				
+				      markers.push(marker);
+				
+				      bounds.extend(place.geometry.location);
+				    }
+				
+				    map.fitBounds(bounds);
+				  });
+
+                    function updateButton(location) {
+                    	lat = location.lat();
+                    	lng = location.lng();
+                    	
+                    	jsonString = lat.toString() + " " + lng.toString();
+                     	
+                     	jsonData = { name:"MyJsBridge" , data:jsonString };
+                    	
+                    	jsonText = JSON.stringify(jsonData);
+                    	
+                    	Tizen.requestToNative(jsonText);
+                    }
+
+                    function initialize() {
+
+                        directionsDisplay = new google.maps.DirectionsRenderer();
+
+                        var mapProp = {
+                            center: myCenter,
+                            zoom: 10,
+                            scrollwheel: true,
+                            mapTypeId: google.maps.MapTypeId.ROADMAP
+                        };
+                        map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+
+                        google.maps.event.addListener(map, 'click', function (event) {
+                            placeMarker(event.latLng);
+                            updateButton( event.latLng );
+                        });
+                        
+                        google.maps.event.addListener(map, 'dblclick', function(event) {
+                        
+                        });
+                        directionsDisplay.setMap(map);
+                    }
+
+                    function placeMarker(location) {
+						if(marker!=null)  
+							marker.setMap(null);
+						
+						endpt = new google.maps.LatLng(location.lat(), location.lng());
+                        marker = new google.maps.Marker({
+                            position: location,
+                            map: map,
+                        });
+                    }
+
+                    function setposition(lat, lng) {
+                        myCenter = new google.maps.LatLng(lat, lng);
+                        startpt = new google.maps.LatLng(lat, lng);
+                        map.setCenter(myCenter);
+                        map.panTo(myCenter);
+                        map.setTilt(45);
+
+                        cur_marker = new google.maps.Marker({
+                            position: myCenter,
+                        });
+
+                        cur_marker.setMap(map);
+                    }
+
+                    function calcRoute() {
+                        var request = {
+                            origin: startpt,
+                            destination: endpt,
+                            travelMode: google.maps.TravelMode.DRIVING
+                        };
+
+                        directionsService.route(request, function (response, status) {
+                            if (status == google.maps.DirectionsStatus.OK) {
+                                directionsDisplay.setDirections(response);
+                            }
+                        });
+                        var trafficLayer = new google.maps.TrafficLayer();
+                        trafficLayer.setMap(map);
+                    }
+
+                    function clearRoute() {
+
+                        directionsDisplay.setDirections({
+                            routes: []
+                        });
+						
+						if(marker!=null)
+							marker.setMap(null);
+                    }
+
+                    google.maps.event.addDomListener(window, 'load', initialize);
+                    google.maps.event.addListener(map, 'bounds_changed', function() {
+    					var bounds = map.getBounds();
+    					searchBox.setBounds(bounds);
+  					});
+                </script>
+                </head>
+                
+
+                <body>
+                    <div
+                    id="googleMap"
+                    style="width: 360px; height: 650px;position:absolute;left:0px;top:0px;"></div>
+
+                </body>
+
+</html>
