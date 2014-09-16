@@ -1,7 +1,8 @@
 #include "LocationListener.h"
-
+#include "WifiManagerEventListener.h"
 
 using namespace Tizen::Locations;
+using namespace Tizen::Net::Wifi;
 
 LocationListener::LocationListener(void)
 {
@@ -18,9 +19,16 @@ void
 LocationListener::OnRegionEntered (Tizen::Locations::RegionId regionId)
 {
 	AppLogTag("LocationMonitor", "LocationListener::OnRegionEntered");
-	WifiManager wifiMgr;
-	Result r;
 
+	//Note:
+	//You can test the Wi-Fi functionality only on target devices.
+	//The Emulator currently does not support this feature.
+
+	WifiManager wifiMgr;
+	result r;
+
+	WifiManagerEventListener* listener = new WifiManagerEventListener();
+	r = wifiMgr.Construct(*listener);
 	//Turn On WiFi
 	if (!wifiMgr.IsActivated())
 	{
