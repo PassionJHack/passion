@@ -6,12 +6,14 @@ using namespace Tizen::Net::Wifi;
 
 LocationListener::LocationListener(void)
 {
-
+	result r;
+	WifiManagerEventListener* listener = new WifiManagerEventListener();
+	r = _wifiMgr.Construct(*listener);
 }
 
 LocationListener::~LocationListener(void)
 {
-
+	delete _wifiMgr;
 }
 
 
@@ -24,36 +26,37 @@ LocationListener::OnRegionEntered (Tizen::Locations::RegionId regionId)
 	//You can test the Wi-Fi functionality only on target devices.
 	//The Emulator currently does not support this feature.
 
-	WifiManager wifiMgr;
 	result r;
 
-	WifiManagerEventListener* listener = new WifiManagerEventListener();
-	r = wifiMgr.Construct(*listener);
 	//Turn On WiFi
-	if (!wifiMgr.IsActivated())
+	if (!_wifiMgr.IsActivated())
 	{
-		r = wifiMgr.Activate();
+		r = _wifiMgr.Activate();
 		if (IsFailed(r))
 		{
 			//TODO: error handling
 		}
 	}
 
-	//Turn Off WiFi
-	if (wifiMgr.IsActivated())
-	{
-		r = wifiMgr.Deactivate();
-		if (IsFailed(r))
-		{
-			//TODO: error handling
-		}
-	}
+
 }
 
 void
 LocationListener::OnRegionLeft (Tizen::Locations::RegionId regionId)
 {
 	AppLogTag("LocationMonitor", "LocationListener::OnRegionLeft");
+
+	result r;
+
+	//Turn Off WiFi
+	if (_wifiMgr.IsActivated())
+	{
+		r = _wifiMgr.Deactivate();
+		if (IsFailed(r))
+		{
+			//TODO: error handling
+		}
+	}
 }
 
 void
