@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>LocationMonitor</name>
+	<name>UsingmodeProfileApp</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -30,7 +30,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildLocation</key>
-					<value>${workspace_loc:/LocationMonitor/Debug}</value>
+					<value>${workspace_loc:/UsingmodeProfile/Debug}</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.cleanBuildTarget</key>
@@ -87,7 +87,7 @@
 	</natures>
 	<filteredResources>
 		<filter>
-			<id>1410875151553</id>
+			<id>0</id>
 			<name></name>
 			<type>26</type>
 			<matcher>

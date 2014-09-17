@@ -4,19 +4,31 @@
 <SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"></SignatureMethod>
 <Reference URI="author-signature.xml">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
-<DigestValue>rW4s8eQDPRukRXL7h7rw/hQtNwEGveUplCv+3f/M9iI=</DigestValue>
+<DigestValue>bI5Wa3sPkJndFuxLCEsNBibznylFdgGUKR6FEpGZ0jI=</DigestValue>
 </Reference>
-<Reference URI="bin/LocationMonitor.exe">
+<Reference URI="bin/Profile.exe">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
-<DigestValue>bdEwnggpSIUOMhimo7+9A4nfpYO1sHA+xPBAhZgmD3s=</DigestValue>
+<DigestValue>U9XfBTdCCBkJA1XvAJwx2h3W5V3jiP/EuZvBMCUqh+A=</DigestValue>
 </Reference>
 <Reference URI="info/manifest.xml">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
-<DigestValue>VZP55XBf9BTLQ8VpCuydShVRXWJLFgoqlgwlLAFdCbA=</DigestValue>
+<DigestValue>m5QoZNfNMU4HxgYxnWmHf+f6hUswMg2/BM4tlKBXGJc=</DigestValue>
+</Reference>
+<Reference URI="res/eng-US.xml">
+<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
+<DigestValue>fkzh2GfOLPnN/nw+YOu3bg54LqwEaSM/3yczfWGb00g=</DigestValue>
+</Reference>
+<Reference URI="res/kor-KR.xml">
+<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
+<DigestValue>cVBotldixea/sfDHYWNpqSwTt1GdpldRi5MMi1JaPmw=</DigestValue>
+</Reference>
+<Reference URI="shared/res/screen-density-xhigh/.DS_Store">
+<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
+<DigestValue>1lFlJ5EFymdzGAUAaI30vcaaLHt3F1LwpG7xILf9jsM=</DigestValue>
 </Reference>
 <Reference URI="shared/res/screen-density-xhigh/mainmenu.png">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
-<DigestValue>1d0oEZHqPn+QzNzGIHwj9ODby6x9ggFs9uOsav6jPNs=</DigestValue>
+<DigestValue>rOE97c0xI/z8qtV6KpiEaicj79gvu/7xOuYVT7bSSBk=</DigestValue>
 </Reference>
 <Reference URI="#prop">
 <Transforms>
@@ -27,9 +39,9 @@
 </Reference>
 </SignedInfo>
 <SignatureValue>
-flHQKm9yrKiBdJi0KGNpoEnshvSMJGUWxLM0yEvsHluL8VTdidyFfiN0/dIljTTC3VnBJq+ed2Cf
-oy2ImFAPyhCOySW8ndG4B2j9dVLZJdWsqRuw9jFo4tgU5EKpJVDGJ47YtMoC58TIrY0hkad+EhMg
-duz4kNdAMpH7fRuRG5Y=
+qhbj6IEtZCzwy6VjEm6vLSjpQH2lLoKzLnMWHtLoJWMDC4VzthVC6vPt34z4v08PkHSEUrAvtdfd
+41gRRnGrQeW15kpEjA/fN/0cYZAL+KHPaUdNXXFVDRqDRxtsAbioQUhgTbiV0Ph9WSt5IpGIUUOV
+wc4HNmfcwI0XqTXCd9E=
 </SignatureValue>
 <KeyInfo>
 <X509Data>

@@ -1,7 +1,9 @@
 #include "LocationListener.h"
+#include <FNet.h>
 
 
 using namespace Tizen::Locations;
+using namespace Tizen::Net::Wifi;
 
 LocationListener::LocationListener(void)
 {
@@ -19,7 +21,7 @@ LocationListener::OnRegionEntered (Tizen::Locations::RegionId regionId)
 {
 	AppLogTag("LocationMonitor", "LocationListener::OnRegionEntered");
 	WifiManager wifiMgr;
-	Result r;
+	result r;
 
 	//Turn On WiFi
 	if (!wifiMgr.IsActivated())
