@@ -1,5 +1,6 @@
 #include "LocationMonitorApp.h"
 #include "LocationListener.h"
+#include "MockLocationListener.h"
 #include <new>
 
 using namespace Tizen::App;
@@ -48,6 +49,9 @@ LocationMonitorApp::OnAppInitializing(AppRegistry& appRegistry)
 	coord.Set(27.0, 125.0, 0.0); //result 	Set (double latitude, double longitude, double altitude)
 	RegionId regionId;
 	pLocProvider->AddMonitoringRegion(coord, 100, regionId);
+
+	MockLocationListener* timer = new MockLocationListener();
+	timer->StartApp();
 
 	return true;
 }

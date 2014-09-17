@@ -13,7 +13,7 @@ LocationListener::LocationListener(void)
 
 LocationListener::~LocationListener(void)
 {
-	delete _wifiMgr;
+	//delete _wifiMgr;
 }
 
 
