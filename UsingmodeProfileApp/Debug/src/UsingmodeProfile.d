@@ -1,5 +1,5 @@
 src/UsingmodeProfile.d: ../src/UsingmodeProfile.cpp \
-  C:\Users\Ahn\Downloads\UsingmodeProfileApp\inc\UsingmodeProfile.h \
+  C:\Users\Ahn\Desktop\UsingmodeProfileApp\inc\UsingmodeProfile.h \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FApp.h \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FAppTypes.h \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FBaseString.h \
@@ -474,11 +474,11 @@ src/UsingmodeProfile.d: ../src/UsingmodeProfile.cpp \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUiVerticalBoxLayout.h \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUiTouchEffect.h \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUiTouchEffectTypes.h \
-  C:\Users\Ahn\Downloads\UsingmodeProfileApp\inc\ProfileFrame.h \
-  C:\Users\Ahn\Downloads\UsingmodeProfileApp\inc\ProfileFormFactory.h \
-  C:\Users\Ahn\Downloads\UsingmodeProfileApp\inc\SceneRegister.h
+  C:\Users\Ahn\Desktop\UsingmodeProfileApp\inc\ProfileFrame.h \
+  C:\Users\Ahn\Desktop\UsingmodeProfileApp\inc\ProfileFormFactory.h \
+  C:\Users\Ahn\Desktop\UsingmodeProfileApp\inc\SceneRegister.h
 
-C:\Users\Ahn\Downloads\UsingmodeProfileApp\inc\UsingmodeProfile.h:
+C:\Users\Ahn\Desktop\UsingmodeProfileApp\inc\UsingmodeProfile.h:
 
 E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FApp.h:
 
@@ -1428,8 +1428,8 @@ E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include
 
 E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUiTouchEffectTypes.h:
 
-C:\Users\Ahn\Downloads\UsingmodeProfileApp\inc\ProfileFrame.h:
+C:\Users\Ahn\Desktop\UsingmodeProfileApp\inc\ProfileFrame.h:
 
-C:\Users\Ahn\Downloads\UsingmodeProfileApp\inc\ProfileFormFactory.h:
+C:\Users\Ahn\Desktop\UsingmodeProfileApp\inc\ProfileFormFactory.h:
 
-C:\Users\Ahn\Downloads\UsingmodeProfileApp\inc\SceneRegister.h:
+C:\Users\Ahn\Desktop\UsingmodeProfileApp\inc\SceneRegister.h:

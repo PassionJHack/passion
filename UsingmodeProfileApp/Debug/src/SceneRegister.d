@@ -1,5 +1,5 @@
 src/SceneRegister.d: ../src/SceneRegister.cpp \
-  C:\Users\Ahn\Downloads\UsingmodeProfileApp\inc\SceneRegister.h \
+  C:\Users\Ahn\Desktop\UsingmodeProfileApp\inc\SceneRegister.h \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUi.h \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUiAccessibilityContainer.h \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FOspConfig.h \
@@ -416,9 +416,9 @@ src/SceneRegister.d: ../src/SceneRegister.cpp \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUiVerticalBoxLayout.h \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUiTouchEffect.h \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUiTouchEffectTypes.h \
-  C:\Users\Ahn\Downloads\UsingmodeProfileApp\inc\ProfileFormFactory.h
+  C:\Users\Ahn\Desktop\UsingmodeProfileApp\inc\ProfileFormFactory.h
 
-C:\Users\Ahn\Downloads\UsingmodeProfileApp\inc\SceneRegister.h:
+C:\Users\Ahn\Desktop\UsingmodeProfileApp\inc\SceneRegister.h:
 
 E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUi.h:
 
@@ -1252,4 +1252,4 @@ E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include
 
 E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUiTouchEffectTypes.h:
 
-C:\Users\Ahn\Downloads\UsingmodeProfileApp\inc\ProfileFormFactory.h:
+C:\Users\Ahn\Desktop\UsingmodeProfileApp\inc\ProfileFormFactory.h:

@@ -5,10 +5,11 @@
  */
 
 #include "DeviceControl.h"
+#include <FBaseLog.h>
 
 using namespace Tizen::Locations;
 using namespace Tizen::Net::Wifi;
-
+using namespace Tizen::System;
 
 DeviceControl::DeviceControl(void)
 {
@@ -22,9 +23,15 @@ DeviceControl::~DeviceControl(void)
 }
 
 void
+DeviceControl::setVolum( int inSize )
+{
+	SettingInfo::SetValue(L"http://tizen.org/setting/sound.system.volume" , inSize );
+}
+
+void
 DeviceControl::WifiActivate()
 {
-	AppLogTag("DeviceControl::WifiActivate");
+	AppLogTag("DeviceControl::WifiActivate","Activity");
 
 	//Note:
 	//You can test the Wi-Fi functionality only on target devices.
@@ -47,7 +54,7 @@ DeviceControl::WifiActivate()
 void
 DeviceControl::WifiDeactivate()
 {
-	AppLogTag("DeviceControl::WifiDeactivate");
+	AppLogTag("DeviceControl::WifiActivate","Deativate");
 
 	result r;
 
@@ -68,7 +75,7 @@ DeviceControl::WifiDeactivate()
 void
 DeviceControl::OnWifiActivated (result r)
 {
-	AppLogTag("DeviceControl::OnWifiActivated");
+	AppLogTag("DeviceControl::WifiActivate","Deativate");
 }
 void
 DeviceControl::OnWifiConnected (const Tizen::Base::String &ssid, result r)
@@ -78,7 +85,7 @@ DeviceControl::OnWifiConnected (const Tizen::Base::String &ssid, result r)
 void
 DeviceControl::OnWifiDeactivated (result r)
 {
-	AppLogTag("DeviceControl::OnWifiDeactivated");
+	AppLogTag("DeviceControl::WifiActivate","Deativate");
 }
 void
 DeviceControl::OnWifiDisconnected (void)

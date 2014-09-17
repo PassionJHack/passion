@@ -8,6 +8,7 @@
 #define DEVICECONTROL_H_
 
 #include <FNet.h>
+#include <FSystem.h>
 
 class DeviceControl
 	: public Tizen::Net::Wifi::IWifiManagerEventListener
@@ -20,6 +21,10 @@ public:
 	void WifiActivate();
 	void WifiDeactivate();
 
+	//set volum info
+
+	void setVolum ( int inSize );
+
 	//WifiManagerEventListener
 	void OnWifiActivated (result r);
 	void OnWifiConnected (const Tizen::Base::String &ssid, result r);
@@ -27,6 +32,8 @@ public:
 	void OnWifiDisconnected (void);
 	void OnWifiRssiChanged (long rssi);
 	void OnWifiScanCompletedN (const Tizen::Base::Collection::IList *pWifiBssInfoList, result r);
+
+
 
 private:
 	Tizen::Net::Wifi::WifiManager _wifiMgr;

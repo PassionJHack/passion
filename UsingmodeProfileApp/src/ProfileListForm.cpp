@@ -22,6 +22,7 @@
 #include "ProfileListForm.h"
 #include "SceneRegister.h"
 #include "ProfileFormFactory.h"
+#include "MockLocationListener.h"
 
 using namespace Tizen::App;
 using namespace Tizen::Base;
@@ -31,6 +32,7 @@ using namespace Tizen::Ui::Controls;
 using namespace Tizen::Ui::Scenes;
 using namespace Tizen::Social;
 using namespace Tizen::Io;
+using namespace Tizen::System;
 
 //static const int LIST_HEIGHT = 112;
 //static const int BUTTON_HEIGHT = 74;
@@ -58,6 +60,7 @@ ProfileListForm::Initialize(void)
 
 
     String dbName(App::GetInstance()->GetAppDataPath() + L"profile.db");
+
     __pProfileDatabase = new Database();
     __pProfileDatabase->Construct(dbName, "a+");
 
@@ -162,6 +165,8 @@ ProfileListForm::OnInitializing(void)
 	__pProfileListView->SetSweepEnabled(true);
 
 	AddControl(__pProfileListView);
+	//(*this);
+	SettingInfo::AddSettingEventListener(*this);
 
 	ListUpdate();
 
@@ -317,6 +322,7 @@ ProfileListForm::OnListViewItemStateChanged(Tizen::Ui::Controls::ListView& listV
 	        r = pEnum->GetStringAt(0, title);
 		    pList->Add(*new (std::nothrow) String(title));
 		    int intItem;
+		    double item;
 	        r = pEnum->GetIntAt(1, intItem);	//year
 		    pList->Add(*new (std::nothrow) Integer(intItem));
 	        r = pEnum->GetIntAt(2, intItem);	//month
@@ -337,10 +343,10 @@ ProfileListForm::OnListViewItemStateChanged(Tizen::Ui::Controls::ListView& listV
 		    pList->Add(*new (std::nothrow) Integer(intItem));
 	        r = pEnum->GetIntAt(10, intItem);	//minute2
 		    pList->Add(*new (std::nothrow) Integer(intItem));
-	        r = pEnum->GetIntAt(11, intItem);	//latitude
-		    pList->Add(*new (std::nothrow) Integer(intItem));
-	        r = pEnum->GetIntAt(12, intItem);	//longitude
-		    pList->Add(*new (std::nothrow) Integer(intItem));
+	        r = pEnum->GetDoubleAt(11, item);	//latitude
+		    pList->Add(*new (std::nothrow) Double(item));
+	        r = pEnum->GetDoubleAt(12, item);	//longitude
+		    pList->Add(*new (std::nothrow) Double(item));
 	        r = pEnum->GetIntAt(13, intItem);	//volume
 		    pList->Add(*new (std::nothrow) Integer(intItem));
 	        r = pEnum->GetIntAt(14, intItem);	//wifi
@@ -492,8 +498,8 @@ ProfileListForm::SaveUsingmodeProfile(Tizen::Base::String title,
 		int day2,
 		int hour2,
 		int minute2,
-		int latitude,
-		int longitude,
+		double latitude,
+		double longitude,
 		int volume,
 		int wifi,
 		Tizen::Base::String memo)
@@ -523,8 +529,8 @@ ProfileListForm::SaveUsingmodeProfile(Tizen::Base::String title,
         pStmt->BindInt(8, day);
         pStmt->BindInt(9, hour);
         pStmt->BindInt(10, minute);
-        pStmt->BindInt(11, latitude);
-        pStmt->BindInt(12, longitude);
+        pStmt->BindDouble(11, latitude);
+        pStmt->BindDouble(12, longitude);
         pStmt->BindInt(13, volume);
         pStmt->BindInt(14, wifi);
         pStmt->BindString(15, memo);
@@ -549,8 +555,8 @@ ProfileListForm::SaveUsingmodeProfile(Tizen::Base::String title,
         pStmt->BindInt(9, day2);
         pStmt->BindInt(10, hour2);
         pStmt->BindInt(11, minute2);
-        pStmt->BindInt(12, latitude);
-        pStmt->BindInt(13, longitude);
+        pStmt->BindDouble(12, latitude);
+        pStmt->BindDouble(13, longitude);
         pStmt->BindInt(14, volume);
         pStmt->BindInt(15, wifi);
         pStmt->BindString(16, memo);
@@ -561,4 +567,22 @@ ProfileListForm::SaveUsingmodeProfile(Tizen::Base::String title,
     delete pStmt;
     delete pEnum;
     ListUpdate();
+}
+
+void
+ProfileListForm::OnSettingChanged (Tizen::Base::String &key)
+{
+	MockLocationListener *pMockLocationListner = new MockLocationListener();
+
+	if(key == L"http://tizen.org/setting/sound.system.volume")
+	{
+	         AppLog("volume1");
+	}
+	else if(key == L"http://tizen.org/setting/sound.ringtone.volume")
+	{
+	        AppLog("volume2");
+	        pMockLocationListner->StartApp();
+	}
+
+
 }

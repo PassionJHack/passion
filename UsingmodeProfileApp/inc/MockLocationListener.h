@@ -8,6 +8,8 @@
 #define MOCKLOCATIONLISTENER_H_
 
 #include <FBase.h>
+#include <FIo.h>
+#include <FApp.h>
 #include "DeviceControl.h"
 
 class MockLocationListener
@@ -24,6 +26,7 @@ private:
 	int __count;
 	Tizen::Base::Runtime::Timer __timer;
 	DeviceControl device;
+	Tizen::Io::Database *__pProfileDatabase;
 };
 
 

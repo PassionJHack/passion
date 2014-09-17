@@ -315,6 +315,13 @@ ProfileDetailForm::OnSceneActivatedN(const Tizen::Ui::Scenes::SceneId& previousS
 			__pDueDateLabelData->SetText(startString2);
 			//TODO: Should be modified!!!!
 
+			Double* pX = static_cast< Double* > ( pArgs->GetAt(12));
+			Double* pY = static_cast< Double* > ( pArgs->GetAt(13));
+
+			String pointStr = pX->ToString() + " , " + pY->ToString();
+
+			__pLocationLabelData->SetText(pointStr);
+
 			Integer* pVolume = static_cast< Integer* >(pArgs->GetAt(14));
 			__pVolumeLabelData->SetText(pVolume->ToString());
 			Integer* pWifi = static_cast< Integer* >(pArgs->GetAt(15));

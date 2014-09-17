@@ -149,7 +149,6 @@ void  LocationMapForm::HandleJavaScriptRequestN (Tizen::Web::Json::IJsonValue *p
 	 pJsonStringValue = static_cast< JsonString* >(pValue);
 	 const wchar_t* mapPointString = pJsonStringValue->GetPointer();
 
-<<<<<<< HEAD
 	 AppLog("data: %ls\n", mapPointString);
 
 	 String *tmpString = new String(mapPointString);
@@ -179,10 +178,6 @@ void  LocationMapForm::HandleJavaScriptRequestN (Tizen::Web::Json::IJsonValue *p
 	 AppLog("data: %f \n", this->x);
 	 AppLog("data: %f \n", this->y);
 
-=======
-	 AppLog("data: %ls\n", pJsonStringValue->GetPointer());
-	 const wchar_t* mapPointString = pJsonStringValue->GetPointer();
->>>>>>> 68914613cd063be48cfe2b11283fd3cb9707de57
 
 }
 bool

@@ -1,5 +1,5 @@
 src/ProfileFrame.d: ../src/ProfileFrame.cpp \
-  C:\Users\Ahn\Downloads\UsingmodeProfileApp\inc\ProfileFrame.h \
+  C:\Users\Ahn\Desktop\UsingmodeProfileApp\inc\ProfileFrame.h \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FBase.h \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FBaseTypes.h \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FBaseLog.h \
@@ -417,7 +417,7 @@ src/ProfileFrame.d: ../src/ProfileFrame.cpp \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUiTouchEffect.h \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUiTouchEffectTypes.h
 
-C:\Users\Ahn\Downloads\UsingmodeProfileApp\inc\ProfileFrame.h:
+C:\Users\Ahn\Desktop\UsingmodeProfileApp\inc\ProfileFrame.h:
 
 E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FBase.h:
 

@@ -164,8 +164,8 @@ src/EditProfileForm.d: ../src/EditProfileForm.cpp \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FLclDateTimeSymbols.h \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FLclNumberSymbols.h \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FLclGregorianCalendar.h \
-  C:\Users\Ahn\Downloads\UsingmodeProfileApp\inc\AppResourceId.h \
-  C:\Users\Ahn\Downloads\UsingmodeProfileApp\inc\EditProfileForm.h \
+  C:\Users\Ahn\Desktop\UsingmodeProfileApp\inc\AppResourceId.h \
+  C:\Users\Ahn\Desktop\UsingmodeProfileApp\inc\EditProfileForm.h \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FSocial.h \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FSclAddress.h \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FSclTypes.h \
@@ -512,7 +512,7 @@ src/EditProfileForm.d: ../src/EditProfileForm.cpp \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUiVerticalBoxLayout.h \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUiTouchEffect.h \
   E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUiTouchEffectTypes.h \
-  C:\Users\Ahn\Downloads\UsingmodeProfileApp\inc\SceneRegister.h
+  C:\Users\Ahn\Desktop\UsingmodeProfileApp\inc\SceneRegister.h
 
 E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FApp.h:
 
@@ -844,9 +844,9 @@ E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include
 
 E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FLclGregorianCalendar.h:
 
-C:\Users\Ahn\Downloads\UsingmodeProfileApp\inc\AppResourceId.h:
+C:\Users\Ahn\Desktop\UsingmodeProfileApp\inc\AppResourceId.h:
 
-C:\Users\Ahn\Downloads\UsingmodeProfileApp\inc\EditProfileForm.h:
+C:\Users\Ahn\Desktop\UsingmodeProfileApp\inc\EditProfileForm.h:
 
 E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FSocial.h:
 
@@ -1540,4 +1540,4 @@ E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include
 
 E:/tizen-sdk/platforms/tizen2.2/rootstraps/tizen-emulator-2.2.native/usr/include/osp\FUiTouchEffectTypes.h:
 
-C:\Users\Ahn\Downloads\UsingmodeProfileApp\inc\SceneRegister.h:
+C:\Users\Ahn\Desktop\UsingmodeProfileApp\inc\SceneRegister.h:

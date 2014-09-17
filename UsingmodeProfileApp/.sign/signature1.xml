@@ -2,6 +2,10 @@
 <SignedInfo>
 <CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"></CanonicalizationMethod>
 <SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"></SignatureMethod>
+<Reference URI="shared/res/screen-density-xhigh/.DS_Store">
+<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
+<DigestValue>1lFlJ5EFymdzGAUAaI30vcaaLHt3F1LwpG7xILf9jsM=</DigestValue>
+</Reference>
 <Reference URI="data/index.html">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
 <DigestValue>b5fM1bOl4/xaPCrKERWhIM1yIv+re+VvzODJubu9Sjc=</DigestValue>
@@ -9,10 +13,6 @@
 <Reference URI="data/uritest.html">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
 <DigestValue>VW8t2rUKIGexql03vBCHXtJdTOp45KhbIqCSnzSQa2s=</DigestValue>
-</Reference>
-<Reference URI="info/manifest.xml">
-<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
-<DigestValue>cBO4FjfShmroBDZTIZgQ7SDDfNN8NfqHHcHFdnRZkYg=</DigestValue>
 </Reference>
 <Reference URI="res/eng-US.xml">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
@@ -22,21 +22,21 @@
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
 <DigestValue>cVBotldixea/sfDHYWNpqSwTt1GdpldRi5MMi1JaPmw=</DigestValue>
 </Reference>
-<Reference URI="shared/res/screen-density-xhigh/.DS_Store">
-<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
-<DigestValue>1lFlJ5EFymdzGAUAaI30vcaaLHt3F1LwpG7xILf9jsM=</DigestValue>
-</Reference>
 <Reference URI="shared/res/screen-density-xhigh/mainmenu.png">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
 <DigestValue>rOE97c0xI/z8qtV6KpiEaicj79gvu/7xOuYVT7bSSBk=</DigestValue>
 </Reference>
+<Reference URI="info/manifest.xml">
+<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
+<DigestValue>vZlz9f4Hbgxz6Fx5e+AvoTugzt32AvI4Bw9wllqVW7g=</DigestValue>
+</Reference>
 <Reference URI="bin/Profile.exe">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
-<DigestValue>YXm8biqf4Rzu95z+CG8p6v650lTj5KzCP9r/FPqKJrQ=</DigestValue>
+<DigestValue>+FR2MpVAm9XcESI7wprJhsLLKnjsvr/S7GFwFDwELWQ=</DigestValue>
 </Reference>
 <Reference URI="author-signature.xml">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
-<DigestValue>e2rXoQABrzSxKK0NRK1svovuvRwcobNfACopjhapdiM=</DigestValue>
+<DigestValue>GXfFzMmYaMFkfl9icQZ3fbUUwDn3w20SMNSN+Gv1HqY=</DigestValue>
 </Reference>
 <Reference URI="#prop">
 <Transforms>
@@ -47,9 +47,9 @@
 </Reference>
 </SignedInfo>
 <SignatureValue>
-Ttv1lucJqb6MQGq/uAjY4ep7GLkIHkn2bdkawxPQycjGLa8cYvVXgrjTpJPESseLnKBwVkVTJH4B
-nFWwztnRr24Y5n8WAw+BBNIfVm2YAzCwhYcxoL4/AHA/0u6RRIj73+lz913puHgt4ajJ3CEYdctQ
-DZFkpPhkIbQDk1mMB/s=
+YCYlXex7VKcO5CCHsY9bwytv5ON/VpxAbsRO0oZVzCvhBFFc9O1yjRzKTbb+VGvIrRrhUYpnYd4o
+lKUOcHUnZpHds2Xq9p32nTwcxmgo1Yz+ne54gdRl/X2hkEnRDJSFuCGUVfqAfvVyN+2AtKpjbktF
+AffD61O9lrRL6G27QpY=
 </SignatureValue>
 <KeyInfo>
 <X509Data>

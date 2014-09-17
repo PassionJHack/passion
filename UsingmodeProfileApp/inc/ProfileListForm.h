@@ -21,6 +21,7 @@
 //#include <FSocial.h>
 #include <FUi.h>
 #include <FIo.h>
+#include <FSystem.h>
 
 class ProfileListForm
 	: public Tizen::Ui::Controls::Form
@@ -30,6 +31,7 @@ class ProfileListForm
 	, public Tizen::Ui::Controls::IListViewItemEventListener
 	, public Tizen::Ui::Controls::IListViewItemProvider
 	, public Tizen::Ui::Scenes::ISceneEventListener
+	, public Tizen::System::ISettingEventListener
 {
 
 public:
@@ -47,8 +49,8 @@ public:
 			int day2,
 			int hour2,
 			int minute2,
-			int latitude,
-			int longitude,
+			double latitude,
+			double longitude,
 			int volume,
 			int wifi,
 			Tizen::Base::String memo);
@@ -73,7 +75,7 @@ public:
 	virtual void OnCalendarEventsChanged(const Tizen::Base::Collection::IList& eventChangeInfoList){}
 	virtual void OnCalendarTodosChanged(const Tizen::Base::Collection::IList& todoChangeInfoList);
 	virtual void OnListViewItemLongPressed(Tizen::Ui::Controls::ListView& listView, int index, int elementId, bool& invokeListViewItemCallback);
-
+	virtual void 	OnSettingChanged (Tizen::Base::String &key);
 private:
 	static const int ID_FOOTER_CREATE = 100;
     static const int IDA_ITEM_DELETE                = 4001;
