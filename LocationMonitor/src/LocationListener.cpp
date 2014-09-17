@@ -4,7 +4,6 @@
 
 =======
 #include "WifiManagerEventListener.h"
->>>>>>> 62392cdb77881b3ab52f6cf5d0e27fa04840b52b
 
 using namespace Tizen::Locations;
 using namespace Tizen::Net::Wifi;
@@ -18,7 +17,7 @@ LocationListener::LocationListener(void)
 
 LocationListener::~LocationListener(void)
 {
-	delete _wifiMgr;
+	//delete _wifiMgr;
 }
 
 
@@ -26,15 +25,11 @@ void
 LocationListener::OnRegionEntered (Tizen::Locations::RegionId regionId)
 {
 	AppLogTag("LocationMonitor", "LocationListener::OnRegionEntered");
-<<<<<<< HEAD
-	WifiManager wifiMgr;
-=======
 
 	//Note:
 	//You can test the Wi-Fi functionality only on target devices.
 	//The Emulator currently does not support this feature.
 
->>>>>>> 62392cdb77881b3ab52f6cf5d0e27fa04840b52b
 	result r;
 
 	//Turn On WiFi
