@@ -63,6 +63,7 @@ private:
 	result CreateWebForm();
 	Tizen::Web::Controls::Web* __pWeb;
 	Tizen::Ui::Controls::Footer* pFooter;
+	float x , y;
 };
 
 

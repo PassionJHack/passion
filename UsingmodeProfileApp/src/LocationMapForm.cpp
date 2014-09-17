@@ -108,7 +108,7 @@ LocationMapForm::OnActionPerformed(const Tizen::Ui::Control& source, int actionI
 
 		CreateProfileForm *pCreateProfileForm = static_cast< CreateProfileForm* >(Application::GetInstance()->GetAppFrame()->GetFrame()->GetControl(FORM_CREATION));
 		if (pCreateProfileForm != NULL) {
-			pCreateProfileForm->SetMap(0, 0);
+			pCreateProfileForm->SetMap(this->x, this->y);
 			AppLog("mobilehunter.net test!!!111");
 		}
 		break;
@@ -147,10 +147,36 @@ void  LocationMapForm::HandleJavaScriptRequestN (Tizen::Web::Json::IJsonValue *p
 
 	 r = pJsonObject->GetValue(&key, pValue);
 	 pJsonStringValue = static_cast< JsonString* >(pValue);
+	 const wchar_t* mapPointString = pJsonStringValue->GetPointer();
 
-	 AppLog("data: %ls\n", pJsonStringValue->GetPointer());
-	 wchar_t* mapPointString = pJsonStringValue->GetPointer();
+	 AppLog("data: %ls\n", mapPointString);
 
+	 String *tmpString = new String(mapPointString);
+
+	 Float x , y;
+
+	 int idx = 0;
+
+
+	 tmpString->IndexOf(' ' , 0 , idx);
+
+	 String *tmpString2 = new String ( mapPointString + idx + 1 );
+
+	 const wchar_t* tmpChar =  tmpString->GetPointer();
+	 wchar_t* tmpChar3 = const_cast<wchar_t*>(tmpChar);
+	 tmpChar3[idx] = '\0';
+	 const wchar_t* tmpChar2 = tmpString2->GetPointer();
+
+	 AppLog("data: %ls \n", tmpChar3);
+	 AppLog("data: %ls \n", tmpChar2);
+
+
+
+	 x.Parse(tmpChar3 , this->x );
+	 y.Parse(tmpChar2 , this->y );
+
+	 AppLog("data: %f \n", this->x);
+	 AppLog("data: %f \n", this->y);
 
 
 }

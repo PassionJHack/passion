@@ -9,10 +9,11 @@
     <Apps>
         <ApiVersion>2.1</ApiVersion>
         <Privileges>
-            <Privilege>http://tizen.org/privilege/calendar.read</Privilege>
+            <Privilege>http://tizen.org/privilege/web.service</Privilege>
             <Privilege>http://tizen.org/privilege/calendar.write</Privilege>
+            <Privilege>http://tizen.org/privilege/calendar.read</Privilege>
         </Privileges>
-        <UiApp LaunchingHistoryVisible="True" Main="True" MenuIconVisible="True" Name="Profile">
+        <UiApp HwAcceleration="On" LaunchingHistoryVisible="True" Main="True" MenuIconVisible="True" Name="Profile">
             <UiScalability BaseScreenSize="Normal" CoordinateSystem="Logical" LogicalCoordinate="720"/>
             <UiTheme SystemTheme="White"/>
             <DisplayNames>

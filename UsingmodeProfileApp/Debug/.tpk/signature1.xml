@@ -4,15 +4,23 @@
 <SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"></SignatureMethod>
 <Reference URI="author-signature.xml">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
-<DigestValue>bI5Wa3sPkJndFuxLCEsNBibznylFdgGUKR6FEpGZ0jI=</DigestValue>
+<DigestValue>sjuNpsh8rdnAjFc+/m9BIT6oe7nrupIy9GcI7OmFaZY=</DigestValue>
 </Reference>
 <Reference URI="bin/Profile.exe">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
-<DigestValue>U9XfBTdCCBkJA1XvAJwx2h3W5V3jiP/EuZvBMCUqh+A=</DigestValue>
+<DigestValue>HGp7wsqJTnzybDsX6vFYns2mhRsQ/7KR030yQAqu1OY=</DigestValue>
+</Reference>
+<Reference URI="data/index.html">
+<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
+<DigestValue>b5fM1bOl4/xaPCrKERWhIM1yIv+re+VvzODJubu9Sjc=</DigestValue>
+</Reference>
+<Reference URI="data/uritest.html">
+<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
+<DigestValue>VW8t2rUKIGexql03vBCHXtJdTOp45KhbIqCSnzSQa2s=</DigestValue>
 </Reference>
 <Reference URI="info/manifest.xml">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
-<DigestValue>m5QoZNfNMU4HxgYxnWmHf+f6hUswMg2/BM4tlKBXGJc=</DigestValue>
+<DigestValue>cBO4FjfShmroBDZTIZgQ7SDDfNN8NfqHHcHFdnRZkYg=</DigestValue>
 </Reference>
 <Reference URI="res/eng-US.xml">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
@@ -39,9 +47,9 @@
 </Reference>
 </SignedInfo>
 <SignatureValue>
-qhbj6IEtZCzwy6VjEm6vLSjpQH2lLoKzLnMWHtLoJWMDC4VzthVC6vPt34z4v08PkHSEUrAvtdfd
-41gRRnGrQeW15kpEjA/fN/0cYZAL+KHPaUdNXXFVDRqDRxtsAbioQUhgTbiV0Ph9WSt5IpGIUUOV
-wc4HNmfcwI0XqTXCd9E=
+ULrv0BRzSmawvRN0HiFEiDLpb9SsWj5z4fMss4vHhMTsKuSs01UGSNzLdyYHDbyp4gR1C2Wu8dNs
+UhjvxMoz7k5qo3/Q2E2P3PH1g90LYNSw1vOtYEE2uskjMqNfQjmKcTSwS4rCme1OCgGV4O0tAaBB
+0l5JW/UPGEMMOD99KLE=
 </SignatureValue>
 <KeyInfo>
 <X509Data>
