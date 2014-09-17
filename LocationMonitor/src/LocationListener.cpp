@@ -1,4 +1,8 @@
 #include "LocationListener.h"
+<<<<<<< HEAD
+#include <FNet.h>
+
+=======
 #include "WifiManagerEventListener.h"
 
 using namespace Tizen::Locations;
