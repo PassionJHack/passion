@@ -82,7 +82,7 @@ private:
 	Tizen::Ui::Controls::Slider* __pVolumeSlider;
 	Tizen::Ui::Controls::CheckButton* __pWifiCheckButton;
 public:
-	void SetMap(int x, int y);
+	void SetMap(float x, float y);
 
 };
 

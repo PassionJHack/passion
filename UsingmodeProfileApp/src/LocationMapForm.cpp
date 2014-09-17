@@ -149,9 +149,7 @@ void  LocationMapForm::HandleJavaScriptRequestN (Tizen::Web::Json::IJsonValue *p
 	 pJsonStringValue = static_cast< JsonString* >(pValue);
 
 	 AppLog("data: %ls\n", pJsonStringValue->GetPointer());
-	 wchar_t* mapPointString = pJsonStringValue->GetPointer();
-
-
+	 const wchar_t* mapPointString = pJsonStringValue->GetPointer();
 
 }
 bool
