@@ -8,6 +8,8 @@
 #define LOCATIONLISTENER_H_
 
 #include <FLocations.h>
+#include <FNet.h>
+
 
 class LocationListener
 	: public Tizen::Locations::ILocationProviderListener
@@ -24,6 +26,7 @@ public:
 	void 	OnRegionMonitoringStatusChanged (Tizen::Locations::LocationServiceStatus status);
 
 private:
+	Tizen::Net::Wifi::WifiManager _wifiMgr;
 
 };
 

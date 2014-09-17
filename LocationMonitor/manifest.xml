@@ -5,6 +5,7 @@
     <Type>C++App</Type>
     <Requirements>
         <Feature Name="http://tizen.org/feature/location.gps">true</Feature>
+        <Feature Name="http://tizen.org/feature/network.wifi">true</Feature>
         <Feature Name="http://tizen.org/feature/platform.native.api.version">2.2</Feature>
     </Requirements>
     <Apps>
@@ -12,6 +13,7 @@
         <Privileges>
             <Privilege>http://tizen.org/privilege/location</Privilege>
             <Privilege>http://tizen.org/privilege/power</Privilege>
+            <Privilege>http://tizen.org/privilege/wifi.admin</Privilege>
         </Privileges>
         <ServiceApp AutoRestart="False" LaunchOnBoot="False" LaunchingHistoryVisible="True" Main="True" Name="LocationMonitor">
             <DisplayNames>

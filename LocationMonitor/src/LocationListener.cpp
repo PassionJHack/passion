@@ -1,18 +1,24 @@
 #include "LocationListener.h"
+<<<<<<< HEAD
 #include <FNet.h>
 
+=======
+#include "WifiManagerEventListener.h"
+>>>>>>> 62392cdb77881b3ab52f6cf5d0e27fa04840b52b
 
 using namespace Tizen::Locations;
 using namespace Tizen::Net::Wifi;
 
 LocationListener::LocationListener(void)
 {
-
+	result r;
+	WifiManagerEventListener* listener = new WifiManagerEventListener();
+	r = _wifiMgr.Construct(*listener);
 }
 
 LocationListener::~LocationListener(void)
 {
-
+	delete _wifiMgr;
 }
 
 
@@ -20,34 +26,46 @@ void
 LocationListener::OnRegionEntered (Tizen::Locations::RegionId regionId)
 {
 	AppLogTag("LocationMonitor", "LocationListener::OnRegionEntered");
+<<<<<<< HEAD
 	WifiManager wifiMgr;
+=======
+
+	//Note:
+	//You can test the Wi-Fi functionality only on target devices.
+	//The Emulator currently does not support this feature.
+
+>>>>>>> 62392cdb77881b3ab52f6cf5d0e27fa04840b52b
 	result r;
 
 	//Turn On WiFi
-	if (!wifiMgr.IsActivated())
+	if (!_wifiMgr.IsActivated())
 	{
-		r = wifiMgr.Activate();
+		r = _wifiMgr.Activate();
 		if (IsFailed(r))
 		{
 			//TODO: error handling
 		}
 	}
 
-	//Turn Off WiFi
-	if (wifiMgr.IsActivated())
-	{
-		r = wifiMgr.Deactivate();
-		if (IsFailed(r))
-		{
-			//TODO: error handling
-		}
-	}
+
 }
 
 void
 LocationListener::OnRegionLeft (Tizen::Locations::RegionId regionId)
 {
 	AppLogTag("LocationMonitor", "LocationListener::OnRegionLeft");
+
+	result r;
+
+	//Turn Off WiFi
+	if (_wifiMgr.IsActivated())
+	{
+		r = _wifiMgr.Deactivate();
+		if (IsFailed(r))
+		{
+			//TODO: error handling
+		}
+	}
 }
 
 void
