@@ -1,6 +1,7 @@
 *.o
 *.d
 *.mk
+.metadata
 .Target-Debug
 .Target-Release
 Target-Debug
