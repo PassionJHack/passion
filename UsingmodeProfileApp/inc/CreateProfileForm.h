@@ -50,18 +50,12 @@ public:
 	virtual void OnAdjustmentValueChanged(const Tizen::Ui::Control& source, int adjustment);
 
 private:
-//	result CreateProfile(void);
 	void CalculateAnchorPosition(Tizen::Ui::Controls::Button* pButton, Tizen::Ui::Controls::ContextMenu* pContextMenu);
 
 private:
 	static const int ID_BUTTON_SAVE = 100;
 
 	static const int ID_LOCATION_BUTTON = 200;
-	static const int ID_CONTEXT_STATUS_NONE = 500;
-	static const int ID_CONTEXT_STATUS_NEEDSACTION = 501;
-	static const int ID_CONTEXT_STATUS_COMPLETED = 502;
-	static const int ID_CONTEXT_STATUS_INPROCESS = 503;
-	static const int ID_CONTEXT_STATUS_CANCELLED = 504;
 
     static const int ID_BUTTON_CHECKED   = 101;
     static const int ID_BUTTON_UNCHECKED = 102;
@@ -69,20 +63,19 @@ private:
 
 	Tizen::Ui::Controls::ScrollPanel* __pScrollPanel;
 
+	Tizen::Ui::Controls::EditField* __pProfileNameEditField;
 	Tizen::Ui::Controls::EditDate* __pStartEditDate;
 	Tizen::Ui::Controls::EditTime* __pStartEditTime;
-
 	Tizen::Ui::Controls::EditDate* __pDueEditDate;
 	Tizen::Ui::Controls::EditTime* __pDueEditTime;
-
-	Tizen::Ui::Controls::EditField* __pSubjectEditField;
 	Tizen::Ui::Controls::Button*    __pLocationButton;
+	double __latitude;
+	double __longitude;
 	Tizen::Ui::Controls::EditField* __pDescriptionEditField;
-
 	Tizen::Ui::Controls::Slider* __pVolumeSlider;
 	Tizen::Ui::Controls::CheckButton* __pWifiCheckButton;
 public:
-	void SetMap(float x, float y);
+	void SetMap(double latitude, double longitude);
 
 };
 

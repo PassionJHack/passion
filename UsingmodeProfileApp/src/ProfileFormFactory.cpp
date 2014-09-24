@@ -16,6 +16,7 @@
 
 #include <new>
 
+#include "SceneRegister.h"
 #include "ProfileFormFactory.h"
 #include "ProfileListForm.h"
 #include "CreateProfileForm.h"

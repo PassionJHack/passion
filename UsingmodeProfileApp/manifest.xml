@@ -4,6 +4,7 @@
     <Version>1.0.0</Version>
     <Type>C++App</Type>
     <Requirements>
+        <Feature Name="http://tizen.org/feature/screen.size.normal">true</Feature>
         <Feature Name="http://tizen.org/feature/location.gps">true</Feature>
         <Feature Name="http://tizen.org/feature/network.wifi">true</Feature>
         <Feature Name="http://tizen.org/feature/screen.size.normal">true</Feature>
@@ -19,7 +20,7 @@
             <Privilege>http://tizen.org/privilege/wifi.admin</Privilege>
             <Privilege>http://tizen.org/privilege/power</Privilege>
         </Privileges>
-        <UiApp HwAcceleration="On" LaunchingHistoryVisible="True" Main="True" MenuIconVisible="True" Name="Profile">
+        <UiApp LaunchingHistoryVisible="True" Main="True" MenuIconVisible="True" Name="Profile">
             <UiScalability BaseScreenSize="Normal" CoordinateSystem="Logical" LogicalCoordinate="720"/>
             <UiTheme SystemTheme="White"/>
             <DisplayNames>

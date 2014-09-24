@@ -56,10 +56,12 @@ private:
 	static const int ID_BUTTON_YES_POPUP = 200;
 	static const int ID_BUTTON_CANCEL_POPUP = 201;
 
-	Tizen::Ui::Controls::Label* __pSubjectLabelData;
+	Tizen::Ui::Controls::Label* __pNameLabelData;
 	Tizen::Ui::Controls::Label* __pStartDateLabelData;
 	Tizen::Ui::Controls::Label* __pDueDateLabelData;
 	Tizen::Ui::Controls::Label* __pLocationLabelData;
+	double __latitude;
+	double __longitude;
 
 	Tizen::Ui::Controls::Label* __pVolumeLabelData;
 	Tizen::Ui::Controls::Label* __pWifiLabelData;

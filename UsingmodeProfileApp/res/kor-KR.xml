@@ -24,10 +24,10 @@
     <text id="IDS_EDIT">수정</text>
     <text id="IDS_DELETE">삭제</text>
     <text id="IDS_PROFILE_NAME">프로파일 명</text>
-    <text id="IDS_FAIL_GET">프로파일 가져오기를 실패했습니다.</text>
     <text id="IDS_EMPTY_LIST">프로파일이 존재하지 않습니다.</text>
-    <text id="IDS_SAVE">프로파일 저장</text>
+    <text id="IDS_FAIL_GET">프로파일 가져오기를 실패했습니다.</text>
     <text id="IDS_LOCATION">위치</text>
+    <text id="IDS_SAVE">프로파일 저장</text>
     <text id="IDS_LOCATION_GUIDE">위치를 입력하세요</text>
     <text id="IDS_HEADER_TITLE">폰 사용모드 프로파일</text>
 </string_table>

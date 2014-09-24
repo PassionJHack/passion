@@ -19,9 +19,9 @@
 #include <FLocales.h>
 
 #include "AppResourceId.h"
+#include "ProfileFormFactory.h"
 #include "CreateProfileForm.h"
 #include "ProfileListForm.h"
-#include "ProfileFormFactory.h"
 #include "SceneRegister.h"
 
 using namespace Tizen::App;
@@ -33,7 +33,6 @@ using namespace Tizen::Ui::Controls;
 using namespace Tizen::Ui::Scenes;
 
 static const int CONTEXT_POSITION = 200;
-
 
 CreateProfileForm::CreateProfileForm()
 {
@@ -51,6 +50,8 @@ CreateProfileForm::Initialize(void)
 	r = Construct(FORM_STYLE_NORMAL | FORM_STYLE_FOOTER | FORM_STYLE_HEADER | FORM_STYLE_PORTRAIT_INDICATOR);
 	TryReturn(!IsFailed(r), false, "[%s] Failed to construct the form.", GetErrorMessage(r));
 	SetName(FORM_CREATION);
+	__latitude = 0;
+	__longitude = 0;
 	return true;
 }
 
@@ -58,23 +59,27 @@ result
 CreateProfileForm::OnInitializing(void)
 {
 	result r = E_SUCCESS;
+	AppResource * pAppResource = Application::GetInstance()->GetAppResource();
 
+	// Header
 	Header* pHeader = GetHeader();
 	AppAssert(pHeader);
 	pHeader->SetStyle(HEADER_STYLE_TITLE);
-	String getProfileCreationTitle;
-	Application::GetInstance()->GetAppResource()->GetString(IDS_CREATE_TITLE, getProfileCreationTitle);
-	pHeader->SetTitleText(getProfileCreationTitle);
+	String getHeaderTitle;
+	pAppResource->GetString(IDS_CREATE_TITLE, getHeaderTitle);
+	pHeader->SetTitleText(getHeaderTitle);
 
+	// Footer
 	Footer* pFooter = GetFooter();
 	AppAssert(pFooter);
 	pFooter->SetStyle(FOOTER_STYLE_BUTTON_TEXT);
 
+	// Save Button
 	FooterItem footerSave;
 	footerSave.Construct(ID_BUTTON_SAVE);
-	String getSave;
-	Application::GetInstance()->GetAppResource()->GetString(IDS_SAVE, getSave);
-	footerSave.SetText(getSave);
+	String getSaveButton;
+	pAppResource->GetString(IDS_SAVE, getSaveButton);
+	footerSave.SetText(getSaveButton);
 	pFooter->AddItem(footerSave);
 	pFooter->AddActionEventListener(*this);
 
@@ -93,26 +98,26 @@ CreateProfileForm::OnInitializing(void)
 	__pScrollPanel = new (std::nothrow) ScrollPanel();
 	__pScrollPanel->Construct(Rectangle(0, 0, GetClientAreaBounds().width, GetClientAreaBounds().height));
 
-	// Subject
-	__pSubjectEditField = new (std::nothrow) EditField();
-	__pSubjectEditField->Construct(Rectangle(UI_X_POSITION_GAP, yPosition, UI_WIDTH, UI_HEIGHT), EDIT_FIELD_STYLE_NORMAL, INPUT_STYLE_FULLSCREEN, EDIT_FIELD_TITLE_STYLE_TOP);
+	// ProfileName
+	__pProfileNameEditField = new (std::nothrow) EditField();
+	__pProfileNameEditField->Construct(Rectangle(UI_X_POSITION_GAP, yPosition, UI_WIDTH, UI_HEIGHT), EDIT_FIELD_STYLE_NORMAL, INPUT_STYLE_FULLSCREEN, EDIT_FIELD_TITLE_STYLE_TOP);
 	String getProfileName, getProfileNameGuid;
-	Application::GetInstance()->GetAppResource()->GetString(IDS_PROFILE_NAME, getProfileName);
-	Application::GetInstance()->GetAppResource()->GetString(IDS_PROFILE_GUIDE, getProfileNameGuid);
-	__pSubjectEditField->SetGuideText(getProfileNameGuid);
-	__pSubjectEditField->SetName(L"Subject");
-	__pSubjectEditField->SetTitleText(getProfileName);
-	__pSubjectEditField->SetOverlayKeypadCommandButtonVisible(false);
-	__pScrollPanel->AddControl(__pSubjectEditField);
+	pAppResource->GetString(IDS_PROFILE_NAME, getProfileName);
+	pAppResource->GetString(IDS_PROFILE_GUIDE, getProfileNameGuid);
+	__pProfileNameEditField->SetGuideText(getProfileNameGuid);
+	__pProfileNameEditField->SetName(L"ProfileName");
+	__pProfileNameEditField->SetTitleText(getProfileName);
+	__pProfileNameEditField->SetOverlayKeypadCommandButtonVisible(false);
+	__pScrollPanel->AddControl(__pProfileNameEditField);
 
 	// Start Date
 	int minYear = Calendarbook::GetMinDateTime().GetYear() + 1;
 	int maxYear = Calendarbook::GetMaxDateTime().GetYear() - 1;
 
 	Label* pStartDateLabel = new (std::nothrow) Label();
-	String getStartDateTime, getEndDateTime;
-	Application::GetInstance()->GetAppResource()->GetString(IDS_START_DATETIME, getStartDateTime);
-	Application::GetInstance()->GetAppResource()->GetString(IDS_END_DATETIME, getEndDateTime);
+	String getStartDateTime, getDudueDateTime;
+	pAppResource->GetString(IDS_START_DATETIME, getStartDateTime);
+	pAppResource->GetString(IDS_END_DATETIME, getDudueDateTime);
 	pStartDateLabel->Construct(Rectangle(UI_X_POSITION_GAP, yPosition += UI_HEIGHT + UI_SPACE, UI_WIDTH, UI_HEIGHT), getStartDateTime);
 	pStartDateLabel->SetTextVerticalAlignment(ALIGNMENT_TOP);
 	pStartDateLabel->SetTextHorizontalAlignment(ALIGNMENT_LEFT);
@@ -135,7 +140,7 @@ CreateProfileForm::OnInitializing(void)
 
 	// Due Date
 	Label* pDueDateLabel = new (std::nothrow) Label();
-	pDueDateLabel->Construct(Rectangle(UI_X_POSITION_GAP, yPosition += UI_HEIGHT, UI_WIDTH, UI_HEIGHT), getEndDateTime);
+	pDueDateLabel->Construct(Rectangle(UI_X_POSITION_GAP, yPosition += UI_HEIGHT, UI_WIDTH, UI_HEIGHT), getDudueDateTime);
 	pDueDateLabel->SetTextVerticalAlignment(ALIGNMENT_TOP);
 	pDueDateLabel->SetTextHorizontalAlignment(ALIGNMENT_LEFT);
 	pDueDateLabel->SetTextColor(COLOR_TITLE_LABEL);
@@ -161,8 +166,7 @@ CreateProfileForm::OnInitializing(void)
 
 	// Location
 	String  getLocationGuide;
-	Application::GetInstance()->GetAppResource()->GetString(IDS_LOCATION_GUIDE, getLocationGuide);
-
+	pAppResource->GetString(IDS_LOCATION_GUIDE, getLocationGuide);
 	__pLocationButton = new (std::nothrow) Button();
 	__pLocationButton->Construct(Rectangle(UI_X_POSITION_GAP, yPosition += UI_HEIGHT + UI_SPACE, UI_WIDTH, UI_HEIGHT), getLocationGuide);
 	__pLocationButton->SetActionId(ID_LOCATION_BUTTON);
@@ -171,9 +175,9 @@ CreateProfileForm::OnInitializing(void)
 
 	// Volume
 	String getVolume;
-	Application::GetInstance()->GetAppResource()->GetString(IDS_VOLUME, getVolume);
+	pAppResource->GetString(IDS_VOLUME, getVolume);
 	__pVolumeSlider = new (std::nothrow) Slider();
-	__pVolumeSlider->Construct(Rectangle(UI_X_POSITION_GAP, yPosition += UI_HEIGHT + UI_SPACE, UI_WIDTH/*GetClientAreaBounds().width*/, UI_HEIGHT + 30), BACKGROUND_STYLE_DEFAULT, true, 0, 15);
+	__pVolumeSlider->Construct(Rectangle(UI_X_POSITION_GAP, yPosition += UI_HEIGHT + UI_SPACE, UI_WIDTH, UI_HEIGHT + 30), BACKGROUND_STYLE_DEFAULT, true, 0, 15);
 	__pVolumeSlider->SetValue(5);
 	__pVolumeSlider->SetTitleText(getVolume);
 	__pVolumeSlider->AddAdjustmentEventListener(*this);
@@ -181,7 +185,7 @@ CreateProfileForm::OnInitializing(void)
 
 	// Wifi
 	String getWifi;
-	Application::GetInstance()->GetAppResource()->GetString(IDS_WIFI, getWifi);
+	pAppResource->GetString(IDS_WIFI, getWifi);
 	__pWifiCheckButton = new (std::nothrow) CheckButton();
 	__pWifiCheckButton->Construct(Rectangle(UI_X_POSITION_GAP, yPosition += UI_HEIGHT + UI_SPACE, UI_WIDTH, UI_HEIGHT),
 			CHECK_BUTTON_STYLE_ONOFF_SLIDING, BACKGROUND_STYLE_DEFAULT, false, getWifi);
@@ -189,10 +193,10 @@ CreateProfileForm::OnInitializing(void)
 	__pWifiCheckButton->AddActionEventListener(*this);
 	__pScrollPanel->AddControl(__pWifiCheckButton);
 
-	// Description
+	// Memo
 	String getDescription, getDescriptionGuide;
-	Application::GetInstance()->GetAppResource()->GetString(IDS_DESCRIPTION, getDescription);
-	Application::GetInstance()->GetAppResource()->GetString(IDS_DESCRIPTION_GUIDE, getDescriptionGuide);
+	pAppResource->GetString(IDS_DESCRIPTION, getDescription);
+	pAppResource->GetString(IDS_DESCRIPTION_GUIDE, getDescriptionGuide);
 	__pDescriptionEditField = new (std::nothrow) EditField();
 	__pDescriptionEditField->Construct(Rectangle(UI_X_POSITION_GAP, yPosition += UI_HEIGHT + UI_SPACE, UI_WIDTH, UI_HEIGHT), EDIT_FIELD_STYLE_NORMAL, INPUT_STYLE_FULLSCREEN, EDIT_FIELD_TITLE_STYLE_TOP);
 	__pDescriptionEditField->SetGuideText(getDescriptionGuide);
@@ -223,40 +227,44 @@ CreateProfileForm::OnActionPerformed(const Tizen::Ui::Control& source, int actio
 	switch (actionId)
 	{
 	case ID_BUTTON_SAVE:
-		if (__pSubjectEditField->GetText().IsEmpty())
+		if (__pProfileNameEditField->GetText().IsEmpty())
 		{
 			int doModal;
 			MessageBox messageBox;
 			String getError, getProfileNameError;
-			Application::GetInstance()->GetAppResource()->GetString(IDS_PROFILE_NAME_ERROR, getProfileNameError);
-			Application::GetInstance()->GetAppResource()->GetString(IDS_ERROR, getError);
+			AppResource * pAppResource = Application::GetInstance()->GetAppResource();
+			pAppResource->GetString(IDS_PROFILE_NAME_ERROR, getProfileNameError);
+			pAppResource->GetString(IDS_ERROR, getError);
 			messageBox.Construct(getError, getProfileNameError, MSGBOX_STYLE_OK, 0);
 			messageBox.ShowAndWait(doModal);
 		}
 		else
 		{
-			AppLog("mobilehunter.net test!!!");
 			pSceneManager->GoBackward(BackwardSceneTransition());
 
 			ProfileListForm *pProfileListForm = static_cast< ProfileListForm* >(Application::GetInstance()->GetAppFrame()->GetFrame()->GetControl(FORM_LIST));
 			if (pProfileListForm != NULL) {
-				pProfileListForm->SaveUsingmodeProfile(__pSubjectEditField->GetText(),
-						__pStartEditDate->GetYear(),
+			    long long id;
+				DateTime startDateTime, dueDateTime;
+
+			    Tizen::System::SystemTime::GetTicks(id);
+				startDateTime.SetValue(__pStartEditDate->GetYear(),
 						__pStartEditDate->GetMonth(),
 						__pStartEditDate->GetDay(),
 						__pStartEditTime->GetHour(),
 						__pStartEditTime->GetMinute(),
-						__pDueEditDate->GetYear(),
+						0);
+				dueDateTime.SetValue(__pDueEditDate->GetYear(),
 						__pDueEditDate->GetMonth(),
 						__pDueEditDate->GetDay(),
 						__pDueEditTime->GetHour(),
 						__pDueEditTime->GetMinute(),
-						0,
-						0,
-						__pVolumeSlider->GetValue(),
+						0);
+				_profile_t_ profileSave = { id, __pProfileNameEditField->GetText(), startDateTime, dueDateTime, __latitude, __longitude, __pVolumeSlider->GetValue(),
 						__pWifiCheckButton->IsSelected()?1:0,
-						__pDescriptionEditField->GetText());
-				AppLog("mobilehunter.net test!!!111");
+						__pDescriptionEditField->GetText() };
+
+				pProfileListForm->SaveUsingmodeProfile(profileSave);	//Create
 			}
 		}
 		break;
@@ -329,11 +337,12 @@ CreateProfileForm::OnAdjustmentValueChanged(const Control& source, int adjustmen
 }
 
 void
-CreateProfileForm::SetMap(float x, float y)
+CreateProfileForm::SetMap(double latitude, double longitude)
 {
-	AppLog("수정 (%f, %f)", x, y);
-
 	String mapButtonString;
-	mapButtonString.Format(20, L"수정 (%f, %f)", x, y);
+	mapButtonString.Format(50, L"latitude: %.2f, longitude: %.2f", latitude, longitude);
+	__latitude = latitude;
+	__longitude = longitude;
+
 	__pLocationButton->SetText(mapButtonString);
 }

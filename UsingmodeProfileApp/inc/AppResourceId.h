@@ -1,7 +1,6 @@
 #ifndef _APP_RESOURCE_ID_H_
 #define _APP_RESOURCE_ID_H_
 
-extern const wchar_t* IDS_;
 extern const wchar_t* IDS_ACCEPT;
 extern const wchar_t* IDS_CREATE_TITLE;
 extern const wchar_t* IDS_DELETE;
@@ -33,9 +32,6 @@ extern const wchar_t* IDS_SAVE;
 extern const wchar_t* IDS_SELECT;
 extern const wchar_t* IDS_START_;
 extern const wchar_t* IDS_START_DATETIME;
-extern const wchar_t* IDS_STRING1;
-extern const wchar_t* IDS_STRING2;
-extern const wchar_t* IDS_STRING3;
 extern const wchar_t* IDS_VOLUME;
 extern const wchar_t* IDS_WIFI;
 

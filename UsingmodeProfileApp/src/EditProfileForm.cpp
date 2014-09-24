@@ -19,8 +19,10 @@
 #include <FLocales.h>
 
 #include "AppResourceId.h"
+#include "ProfileFormFactory.h"
 #include "EditProfileForm.h"
 #include "SceneRegister.h"
+#include "ProfileListForm.h"
 
 using namespace Tizen::App;
 using namespace Tizen::Base;
@@ -34,10 +36,6 @@ using namespace Tizen::Ui::Scenes;
 static const int CONTEXT_POSITION = 200;
 
 EditProfileForm::EditProfileForm()
-	: __pProfile(null)
-	, __selectedPriority(TODO_PRIORITY_LOW)
-	, __selectedSensitivity(SENSITIVITY_PUBLIC)
-	, __selectedStatus(TODO_STATUS_NONE)
 {
 }
 
@@ -52,7 +50,10 @@ EditProfileForm::Initialize(void)
 
 	r = Construct(FORM_STYLE_NORMAL | FORM_STYLE_FOOTER | FORM_STYLE_HEADER | FORM_STYLE_PORTRAIT_INDICATOR);
 	TryReturn(!IsFailed(r), false, "[%s] Failed to construct the form.", GetErrorMessage(r));
-
+    SetName(FORM_EDITION);
+	__latitude = 0;
+	__longitude = 0;
+    __currentID = -1;
 	return true;
 }
 
@@ -60,11 +61,15 @@ result
 EditProfileForm::OnInitializing(void)
 {
 	result r = E_SUCCESS;
+	AppResource * pAppResource = Application::GetInstance()->GetAppResource();
+	String resourceString;
 
 	Header* pHeader = GetHeader();
 	AppAssert(pHeader);
 	pHeader->SetStyle(HEADER_STYLE_TITLE);
-	pHeader->SetTitleText(L"Edition");
+    String getProfileCreationTitle;
+    pAppResource->GetString(IDS_EDIT, getProfileCreationTitle);
+	pHeader->SetTitleText(getProfileCreationTitle);
 
 	Footer* pFooter = GetFooter();
 	AppAssert(pFooter);
@@ -72,7 +77,9 @@ EditProfileForm::OnInitializing(void)
 
 	FooterItem footerSave;
 	footerSave.Construct(ID_BUTTON_SAVE);
-	footerSave.SetText(L"Save");
+    String getSave;
+    pAppResource->GetString(IDS_SAVE, getSave);
+    footerSave.SetText(getSave);
 	pFooter->AddItem(footerSave);
 	pFooter->AddActionEventListener(*this);
 
@@ -85,28 +92,34 @@ EditProfileForm::OnInitializing(void)
 	static const int UI_WIDTH = GetClientAreaBounds().width - 40;
 	static const int UI_X_POSITION_MIDDLE = UI_WIDTH / 4;
 	static const int UI_HEIGHT = 112;
-	static const int BUTTON_HEIGHT = 74;
 	static const int UI_SPACE = 26;
 	int yPosition = 0;
 
 	__pScrollPanel = new (std::nothrow) ScrollPanel();
 	__pScrollPanel->Construct(Rectangle(0, 0, GetClientAreaBounds().width, GetClientAreaBounds().height));
 
-	// Subject
-	__pSubjectEditField = new (std::nothrow) EditField();
-	__pSubjectEditField->Construct(Rectangle(UI_X_POSITION_GAP, yPosition, UI_WIDTH, UI_HEIGHT), EDIT_FIELD_STYLE_NORMAL, INPUT_STYLE_FULLSCREEN, EDIT_FIELD_TITLE_STYLE_TOP);
-	__pSubjectEditField->SetGuideText(L"Enter the subject");
-	__pSubjectEditField->SetName(L"Subject");
-	__pSubjectEditField->SetTitleText(L"Subject");
-	__pSubjectEditField->SetOverlayKeypadCommandButtonVisible(false);
-	__pScrollPanel->AddControl(__pSubjectEditField);
+	// 1. Profile Name
+	__pNameEditField = new (std::nothrow) EditField();
+	__pNameEditField->Construct(Rectangle(UI_X_POSITION_GAP, yPosition, UI_WIDTH, UI_HEIGHT), EDIT_FIELD_STYLE_NORMAL, INPUT_STYLE_FULLSCREEN, EDIT_FIELD_TITLE_STYLE_TOP);
+    String getProfileName, getProfileNameGuid;
+    pAppResource->GetString(IDS_PROFILE_NAME, getProfileName);
+    pAppResource->GetString(IDS_PROFILE_GUIDE, getProfileNameGuid);
+    __pNameEditField->SetGuideText(getProfileNameGuid);
+    __pNameEditField->SetName(L"Name");
+    __pNameEditField->SetTitleText(getProfileName);
 
-	// Start Date
+	__pNameEditField->SetOverlayKeypadCommandButtonVisible(false);
+	__pScrollPanel->AddControl(__pNameEditField);
+
+	// 2. Profile Start Date
 	int minYear = Calendarbook::GetMinDateTime().GetYear() + 1;
 	int maxYear = Calendarbook::GetMaxDateTime().GetYear() - 1;
 
 	Label* pStartDateLabel = new (std::nothrow) Label();
-	pStartDateLabel->Construct(Rectangle(UI_X_POSITION_GAP, yPosition += UI_HEIGHT + UI_SPACE, UI_WIDTH, UI_HEIGHT), L"Start");
+    String getStartDateTime, getDudueDateTime;
+    pAppResource->GetString(IDS_START_DATETIME, getStartDateTime);
+    pAppResource->GetString(IDS_END_DATETIME, getDudueDateTime);
+	pStartDateLabel->Construct(Rectangle(UI_X_POSITION_GAP, yPosition += UI_HEIGHT + UI_SPACE, UI_WIDTH, UI_HEIGHT), getStartDateTime);
 	pStartDateLabel->SetTextVerticalAlignment(ALIGNMENT_TOP);
 	pStartDateLabel->SetTextHorizontalAlignment(ALIGNMENT_LEFT);
 	pStartDateLabel->SetTextColor(COLOR_TITLE_LABEL);
@@ -126,9 +139,9 @@ EditProfileForm::OnInitializing(void)
 	__pStartEditTime->AddTimeChangeEventListener(*this);
 	__pScrollPanel->AddControl(__pStartEditTime);
 
-	// Due Date
+	// 3. Profile Due Date
 	Label* pDueDateLabel = new (std::nothrow) Label();
-	pDueDateLabel->Construct(Rectangle(UI_X_POSITION_GAP, yPosition += UI_HEIGHT, UI_WIDTH, UI_HEIGHT), L"Due");
+	pDueDateLabel->Construct(Rectangle(UI_X_POSITION_GAP, yPosition += UI_HEIGHT, UI_WIDTH, UI_HEIGHT), getDudueDateTime);
 	pDueDateLabel->SetTextVerticalAlignment(ALIGNMENT_TOP);
 	pDueDateLabel->SetTextHorizontalAlignment(ALIGNMENT_LEFT);
 	pDueDateLabel->SetTextColor(COLOR_TITLE_LABEL);
@@ -152,89 +165,46 @@ EditProfileForm::OnInitializing(void)
 	__pDueEditTime->AddTimeChangeEventListener(*this);
 	__pScrollPanel->AddControl(__pDueEditTime);
 
-	// Location
-	__pLocationEditField = new (std::nothrow) EditField();
-	__pLocationEditField->Construct(Rectangle(UI_X_POSITION_GAP, yPosition += UI_HEIGHT + UI_SPACE, UI_WIDTH, UI_HEIGHT), EDIT_FIELD_STYLE_NORMAL, INPUT_STYLE_FULLSCREEN, EDIT_FIELD_TITLE_STYLE_TOP);
-	__pLocationEditField->SetGuideText(L"Enter the location");
-	__pLocationEditField->SetName(L"Location");
-	__pLocationEditField->SetTitleText(L"Location");
-	__pLocationEditField->SetOverlayKeypadCommandButtonVisible(false);
-	__pScrollPanel->AddControl(__pLocationEditField);
+	 // 4~5. Profile Location(Latitude, Longitude)
+    String  getLocationGuide;
+    pAppResource->GetString(IDS_LOCATION_GUIDE, getLocationGuide);
+    __pLocationButton = new (std::nothrow) Button();
+    __pLocationButton->Construct(Rectangle(UI_X_POSITION_GAP, yPosition += UI_HEIGHT + UI_SPACE, UI_WIDTH, UI_HEIGHT), getLocationGuide);
+    __pLocationButton->SetActionId(ID_LOCATION_BUTTON);
+    __pLocationButton->AddActionEventListener(*this);
+    __pScrollPanel->AddControl(__pLocationButton);
 
-	// Priority
-	Label* pPriorityLabel = new (std::nothrow) Label();
-	pPriorityLabel->Construct(Rectangle(UI_X_POSITION_GAP, yPosition += UI_HEIGHT + UI_SPACE, UI_WIDTH, UI_HEIGHT), L"Priority");
-	pPriorityLabel->SetTextHorizontalAlignment(ALIGNMENT_LEFT);
-	pPriorityLabel->SetTextColor(COLOR_TITLE_LABEL);
-	pPriorityLabel->SetBackgroundColor(COLOR_BACKGROUND_LABEL);
-	__pScrollPanel->AddControl(pPriorityLabel);
+    // 6. Profile Volume
+    String getVolume;
+    pAppResource->GetString(IDS_VOLUME, getVolume);
+    __pVolumeSlider = new (std::nothrow) Slider();
+    __pVolumeSlider->Construct(Rectangle(UI_X_POSITION_GAP, yPosition += UI_HEIGHT + UI_SPACE, UI_WIDTH, UI_HEIGHT + 30), BACKGROUND_STYLE_DEFAULT, true, 0, 15);
+    __pVolumeSlider->SetValue(5);
+    __pVolumeSlider->SetTitleText(getVolume);
+    __pVolumeSlider->AddAdjustmentEventListener(*this);
+    __pScrollPanel->AddControl(__pVolumeSlider);
+    
+    // 7. Profile Wifi
+    String getWifi;
+    pAppResource->GetString(IDS_WIFI, getWifi);
+    __pWifiCheckButton = new (std::nothrow) CheckButton();
+    __pWifiCheckButton->Construct(Rectangle(UI_X_POSITION_GAP, yPosition += UI_HEIGHT + UI_SPACE, UI_WIDTH, UI_HEIGHT),
+                                  CHECK_BUTTON_STYLE_ONOFF_SLIDING, BACKGROUND_STYLE_DEFAULT, false, getWifi);
+    __pWifiCheckButton->SetActionId(ID_BUTTON_CHECKED, ID_BUTTON_UNCHECKED, ID_BUTTON_SELECTED);
+    __pWifiCheckButton->AddActionEventListener(*this);
+    __pScrollPanel->AddControl(__pWifiCheckButton);
 
-	__pPriorityContextButton = new (std::nothrow) Button();
-	__pPriorityContextButton->Construct(Rectangle(UI_X_POSITION_MIDDLE + UI_X_POSITION_GAP, yPosition + 19, UI_WIDTH * 3 / 4, BUTTON_HEIGHT), L"Low");
-	__pPriorityContextButton->SetActionId(ID_BUTTON_PRIORITY);
-	__pPriorityContextButton->AddActionEventListener(*this);
-	__pScrollPanel->AddControl(__pPriorityContextButton);
-
-	__pPriorityTextContextMenu = new (std::nothrow) ContextMenu();
-	__pPriorityTextContextMenu->Construct(Point(UI_X_POSITION_GAP + UI_WIDTH * 5 / 8, yPosition + CONTEXT_POSITION), CONTEXT_MENU_STYLE_LIST, CONTEXT_MENU_ANCHOR_DIRECTION_UPWARD);
-	__pPriorityTextContextMenu->AddItem(L"High", ID_CONTEXT_PRIORITY_HIGH);
-	__pPriorityTextContextMenu->AddItem(L"Normal", ID_CONTEXT_PRIORITY_NORMAL);
-	__pPriorityTextContextMenu->AddItem(L"Low", ID_CONTEXT_PRIORITY_LOW);
-	__pPriorityTextContextMenu->AddActionEventListener(*this);
-
-	// Sensitivity
-	Label* pSensitivityLabel = new (std::nothrow) Label();
-	pSensitivityLabel->Construct(Rectangle(UI_X_POSITION_GAP, yPosition += UI_HEIGHT, UI_WIDTH, UI_HEIGHT), L"Sensitivity");
-	pSensitivityLabel->SetTextHorizontalAlignment(ALIGNMENT_LEFT);
-	pSensitivityLabel->SetTextColor(COLOR_TITLE_LABEL);
-	pSensitivityLabel->SetBackgroundColor(COLOR_BACKGROUND_LABEL);
-	__pScrollPanel->AddControl(pSensitivityLabel);
-
-	__pSensitivityContextButton = new (std::nothrow) Button();
-	__pSensitivityContextButton->Construct(Rectangle(UI_X_POSITION_MIDDLE + UI_X_POSITION_GAP, yPosition + 19, UI_WIDTH * 3 / 4, BUTTON_HEIGHT), L"Public");
-	__pSensitivityContextButton->SetActionId(ID_BUTTON_SENSITIVITY);
-	__pSensitivityContextButton->AddActionEventListener(*this);
-	__pScrollPanel->AddControl(__pSensitivityContextButton);
-
-	__pSensitivityTextContextMenu = new (std::nothrow) ContextMenu();
-	__pSensitivityTextContextMenu->Construct(Point(UI_X_POSITION_GAP + UI_WIDTH * 5 / 8, yPosition + CONTEXT_POSITION), CONTEXT_MENU_STYLE_LIST, CONTEXT_MENU_ANCHOR_DIRECTION_UPWARD);
-	__pSensitivityTextContextMenu->AddItem(L"Public", ID_CONTEXT_SENSITIVITY_PUBLIC);
-	__pSensitivityTextContextMenu->AddItem(L"Private", ID_CONTEXT_SENSITIVITY_PRIVATE);
-	__pSensitivityTextContextMenu->AddItem(L"Confidential", ID_CONTEXT_SENSITIVITY_CONFIDENTIAL);
-	__pSensitivityTextContextMenu->AddActionEventListener(*this);
-
-	// Status
-	Label* pStatusLabel = new (std::nothrow) Label();
-	pStatusLabel->Construct(Rectangle(UI_X_POSITION_GAP, yPosition += UI_HEIGHT, UI_WIDTH, UI_HEIGHT), L"Status");
-	pStatusLabel->SetTextHorizontalAlignment(ALIGNMENT_LEFT);
-	pStatusLabel->SetTextColor(COLOR_TITLE_LABEL);
-	pStatusLabel->SetBackgroundColor(COLOR_BACKGROUND_LABEL);
-	__pScrollPanel->AddControl(pStatusLabel);
-
-	__pStatusContextButton = new (std::nothrow) Button();
-	__pStatusContextButton->Construct(Rectangle(UI_X_POSITION_MIDDLE + UI_X_POSITION_GAP, yPosition + 19, UI_WIDTH * 3 / 4, BUTTON_HEIGHT), L"None");
-	__pStatusContextButton->SetActionId(ID_BUTTON_STATUS);
-	__pStatusContextButton->AddActionEventListener(*this);
-	__pScrollPanel->AddControl(__pStatusContextButton);
-
-	__pStatusTextContextMenu = new (std::nothrow) ContextMenu();
-	__pStatusTextContextMenu->Construct(Point(UI_X_POSITION_GAP + UI_WIDTH * 5 / 8, yPosition + CONTEXT_POSITION), CONTEXT_MENU_STYLE_LIST, CONTEXT_MENU_ANCHOR_DIRECTION_UPWARD);
-	__pStatusTextContextMenu->AddItem(L"None", ID_CONTEXT_STATUS_NONE);
-	__pStatusTextContextMenu->AddItem(L"Needs action", ID_CONTEXT_STATUS_NEEDSACTION);
-	__pStatusTextContextMenu->AddItem(L"Completed", ID_CONTEXT_STATUS_COMPLETED);
-	__pStatusTextContextMenu->AddItem(L"In process", ID_CONTEXT_STATUS_INPROCESS);
-	__pStatusTextContextMenu->AddItem(L"Cancelled", ID_CONTEXT_STATUS_CANCELLED);
-	__pStatusTextContextMenu->SetMaxVisibleItemsCount(3);
-	__pStatusTextContextMenu->AddActionEventListener(*this);
-
-	// Description
-	__pDescriptionEditField = new (std::nothrow) EditField();
-	__pDescriptionEditField->Construct(Rectangle(UI_X_POSITION_GAP, yPosition += UI_HEIGHT + UI_SPACE, UI_WIDTH, UI_HEIGHT), EDIT_FIELD_STYLE_NORMAL, INPUT_STYLE_FULLSCREEN, EDIT_FIELD_TITLE_STYLE_TOP);
-	__pDescriptionEditField->SetGuideText(L"Enter the description");
-	__pDescriptionEditField->SetName(L"Description");
-	__pDescriptionEditField->SetTitleText(L"Description");
-	__pDescriptionEditField->SetOverlayKeypadCommandButtonVisible(false);
-	__pScrollPanel->AddControl(__pDescriptionEditField);
+    // 8. Profile Memo
+    String getDescription, getDescriptionGuide;
+    pAppResource->GetString(IDS_DESCRIPTION, getDescription);
+    pAppResource->GetString(IDS_DESCRIPTION_GUIDE, getDescriptionGuide);
+    __pDescriptionEditField = new (std::nothrow) EditField();
+    __pDescriptionEditField->Construct(Rectangle(UI_X_POSITION_GAP, yPosition += UI_HEIGHT + UI_SPACE, UI_WIDTH, UI_HEIGHT), EDIT_FIELD_STYLE_NORMAL, INPUT_STYLE_FULLSCREEN, EDIT_FIELD_TITLE_STYLE_TOP);
+    __pDescriptionEditField->SetGuideText(getDescriptionGuide);
+    __pDescriptionEditField->SetName(L"Description");
+    __pDescriptionEditField->SetTitleText(getDescription);
+    __pDescriptionEditField->SetOverlayKeypadCommandButtonVisible(false);
+    __pScrollPanel->AddControl(__pDescriptionEditField);
 
 	AddControl(__pScrollPanel);
 
@@ -246,23 +216,12 @@ EditProfileForm::OnTerminating(void)
 {
 	result r = E_SUCCESS;
 
-	if (__pProfile != null)
-	{
-		delete __pProfile;
-	}
-
-	__pPriorityTextContextMenu->Destroy();
-	__pSensitivityTextContextMenu->Destroy();
-	__pStatusTextContextMenu->Destroy();
-
 	return r;
 }
 
 void
 EditProfileForm::OnActionPerformed(const Tizen::Ui::Control& source, int actionId)
 {
-	result r = E_SUCCESS;
-
 	SceneManager* pSceneManager = SceneManager::GetInstance();
 	AppAssert(pSceneManager);
 
@@ -270,162 +229,59 @@ EditProfileForm::OnActionPerformed(const Tizen::Ui::Control& source, int actionI
 	{
 	case ID_BUTTON_SAVE:
 	{
-		if (__pSubjectEditField->GetText().IsEmpty())
+		if (__pNameEditField->GetText().IsEmpty())
 		{
 			int doModal;
 			MessageBox messageBox;
+			AppResource * pAppResource = Application::GetInstance()->GetAppResource();
 			String getError, getProfileNameError;
-			Application::GetInstance()->GetAppResource()->GetString(IDS_ERROR, getError);
-			Application::GetInstance()->GetAppResource()->GetString(IDS_PROFILE_NAME_ERROR, getProfileNameError);
+			pAppResource->GetString(IDS_ERROR, getError);
+			pAppResource->GetString(IDS_PROFILE_NAME_ERROR, getProfileNameError);
 			messageBox.Construct(getError, getProfileNameError, MSGBOX_STYLE_OK, 0);
 			messageBox.ShowAndWait(doModal);
 		}
 		else
 		{
-			r = UpdateProfile();
-			TryReturnVoid(!IsFailed(r), "[%s] Failed to update Profile.", GetErrorMessage(r));
+            ProfileListForm *pProfileListForm = static_cast< ProfileListForm* >(Application::GetInstance()->GetAppFrame()->GetFrame()->GetControl(FORM_LIST));
+            if (pProfileListForm != NULL) {
+				DateTime startDateTime, dueDateTime;
+				startDateTime.SetValue(__pStartEditDate->GetYear(),
+						__pStartEditDate->GetMonth(),
+						__pStartEditDate->GetDay(),
+						__pStartEditTime->GetHour(),
+						__pStartEditTime->GetMinute(),
+						0);
+				dueDateTime.SetValue(__pDueEditDate->GetYear(),
+						__pDueEditDate->GetMonth(),
+						__pDueEditDate->GetDay(),
+						__pDueEditTime->GetHour(),
+						__pDueEditTime->GetMinute(),
+						0);
+				_profile_t_ profileSave = { __currentID, __pNameEditField->GetText(), startDateTime, dueDateTime, __latitude, __longitude, __pVolumeSlider->GetValue(),
+						__pWifiCheckButton->IsSelected()?1:0,
+						__pDescriptionEditField->GetText() };
 
-			ArrayList* pList = new (std::nothrow) ArrayList();
-			pList->Construct();
-			pList->Add(*new (std::nothrow) Integer(__pProfile->GetRecordId()));
+				ArrayList* pList = new (std::nothrow) ArrayList();
+				pList->Construct();
+		        pList->Add(*new (std::nothrow) Integer(profileSave.index));
+		        pList->Add(*new (std::nothrow) String(profileSave.name));
+		        pList->Add(*new (std::nothrow) String(profileSave.startDateTime.ToString()));
+		        pList->Add(*new (std::nothrow) String(profileSave.dueDateTime.ToString()));
+		        pList->Add(*new (std::nothrow) Double(profileSave.latitude));
+		        pList->Add(*new (std::nothrow) Double(profileSave.longitude));
+		        pList->Add(*new (std::nothrow) Integer(profileSave.volume));
+		        pList->Add(*new (std::nothrow) Integer(profileSave.wifi));
+		        pList->Add(*new (std::nothrow) String(profileSave.memo));
 
-			pSceneManager->GoBackward(BackwardSceneTransition(SCENE_DETAIL), pList);
+				pSceneManager->GoBackward(BackwardSceneTransition(SCENE_DETAIL), pList);
+				pProfileListForm->UpdateUsingmodeProfile(profileSave);	// Update
+			}
 		}
 	}
 	break;
-
-	case ID_BUTTON_PRIORITY:
-	{
-		CalculateAnchorPosition(__pPriorityContextButton, __pPriorityTextContextMenu);
-
-		__pPriorityTextContextMenu->SetFocusable(true);
-		__pPriorityTextContextMenu->SetShowState(true);
-		__pPriorityTextContextMenu->SetFocus();
-		__pPriorityTextContextMenu->Show();
-	}
-	break;
-
-	case ID_CONTEXT_PRIORITY_LOW:
-	{
-		__selectedPriority = TODO_PRIORITY_LOW;
-		__pPriorityContextButton->SetText(L"Low");
-		__pPriorityContextButton->SetFocus();
-		__pPriorityContextButton->Invalidate(false);
-	}
-	break;
-
-	case ID_CONTEXT_PRIORITY_NORMAL:
-	{
-		__selectedPriority = TODO_PRIORITY_NORMAL;
-		__pPriorityContextButton->SetText(L"Normal");
-		__pPriorityContextButton->SetFocus();
-		__pPriorityContextButton->Invalidate(false);
-	}
-	break;
-
-	case ID_CONTEXT_PRIORITY_HIGH:
-	{
-		__selectedPriority = TODO_PRIORITY_HIGH;
-		__pPriorityContextButton->SetText(L"High");
-		__pPriorityContextButton->SetFocus();
-		__pPriorityContextButton->Invalidate(false);
-	}
-	break;
-
-	case ID_BUTTON_SENSITIVITY:
-	{
-		CalculateAnchorPosition(__pSensitivityContextButton, __pSensitivityTextContextMenu);
-
-		__pSensitivityTextContextMenu->SetFocusable(true);
-		__pSensitivityTextContextMenu->SetShowState(true);
-		__pSensitivityTextContextMenu->SetFocus();
-		__pSensitivityTextContextMenu->Show();
-	}
-	break;
-
-	case ID_CONTEXT_SENSITIVITY_PUBLIC:
-	{
-		__selectedSensitivity = SENSITIVITY_PUBLIC;
-		__pSensitivityContextButton->SetText(L"Public");
-		__pSensitivityContextButton->SetFocus();
-		__pSensitivityContextButton->Invalidate(false);
-	}
-	break;
-
-	case ID_CONTEXT_SENSITIVITY_PRIVATE:
-	{
-		__selectedSensitivity = SENSITIVITY_PRIVATE;
-		__pSensitivityContextButton->SetText(L"Private");
-		__pSensitivityContextButton->SetFocus();
-		__pSensitivityContextButton->Invalidate(false);
-	}
-	break;
-
-	case ID_CONTEXT_SENSITIVITY_CONFIDENTIAL:
-	{
-		__selectedSensitivity = SENSITIVITY_CONFIDENTIAL;
-		__pSensitivityContextButton->SetText(L"Confidential");
-		__pSensitivityContextButton->SetFocus();
-		__pSensitivityContextButton->Invalidate(false);
-	}
-	break;
-
-	case ID_BUTTON_STATUS:
-	{
-		CalculateAnchorPosition(__pStatusContextButton, __pStatusTextContextMenu);
-
-		__pStatusTextContextMenu->SetFocusable(true);
-		__pStatusTextContextMenu->SetShowState(true);
-		__pStatusTextContextMenu->SetFocus();
-		__pStatusTextContextMenu->Show();
-	}
-	break;
-
-	case ID_CONTEXT_STATUS_NONE:
-	{
-		__selectedStatus = TODO_STATUS_NONE;
-		__pStatusContextButton->SetText(L"None");
-		__pStatusContextButton->SetFocus();
-		__pStatusContextButton->Invalidate(false);
-	}
-	break;
-
-	case ID_CONTEXT_STATUS_NEEDSACTION:
-	{
-		__selectedStatus = TODO_STATUS_NEEDS_ACTION;
-		__pStatusContextButton->SetText(L"Needs action");
-		__pStatusContextButton->SetFocus();
-		__pStatusContextButton->Invalidate(false);
-	}
-	break;
-
-	case ID_CONTEXT_STATUS_COMPLETED:
-	{
-		__selectedStatus = TODO_STATUS_COMPLETED;
-		__pStatusContextButton->SetText(L"Completed");
-		__pStatusContextButton->SetFocus();
-		__pStatusContextButton->Invalidate(false);
-	}
-	break;
-
-	case ID_CONTEXT_STATUS_INPROCESS:
-	{
-		__selectedStatus = TODO_STATUS_IN_PROCESS;
-		__pStatusContextButton->SetText(L"In process");
-		__pStatusContextButton->SetFocus();
-		__pStatusContextButton->Invalidate(false);
-	}
-	break;
-
-	case ID_CONTEXT_STATUS_CANCELLED:
-	{
-		__selectedStatus = TODO_STATUS_CANCELLED;
-		__pStatusContextButton->SetText(L"Cancelled");
-		__pStatusContextButton->SetFocus();
-		__pStatusContextButton->Invalidate(false);
-	}
-	break;
-
+    case ID_LOCATION_BUTTON:
+        pSceneManager->GoForward(ForwardSceneTransition(SCENE_LOCATION));
+        break;
 	default:
 		break;
 	}
@@ -445,11 +301,59 @@ EditProfileForm::OnSceneActivatedN(const Tizen::Ui::Scenes::SceneId& previousSce
 {
 	if (pArgs != null)
 	{
-		__pProfile = static_cast< CalTodo* >(pArgs->GetAt(0));
-		LoadProfile();
-		pArgs->RemoveAll(false);
-		delete pArgs;
-	}
+        Integer* pId = static_cast< Integer* >(pArgs->GetAt(0));				// 0. Profile Index : Not List Index
+        if (pId == null)
+        {
+            MessageBox messageBox;
+            String getError, getFailGet;
+			AppResource * pAppResource = Application::GetInstance()->GetAppResource();
+			pAppResource->GetString(IDS_ERROR, getError);
+			pAppResource->GetString(IDS_FAIL_GET, getFailGet);
+            messageBox.Construct(getError, getFailGet, MSGBOX_STYLE_OK, 0);
+            int doModal;
+            messageBox.ShowAndWait(doModal);
+        }
+        else
+        {
+            __currentID = pId->ToInt();
+
+            String* pNameValue = static_cast< String* >(pArgs->GetAt(1));		// 1. Profile Name
+            if (pNameValue == null) {
+            	__pNameEditField->SetText(L"(No Name)");
+            } else {
+            	__pNameEditField->SetText(*pNameValue);
+            }
+            String* pStartDateString = static_cast< String* >(pArgs->GetAt(2));	// 2. Profile Start Date
+            DateTime StartDateTime;
+            Tizen::Base::DateTime::Parse(*pStartDateString, StartDateTime);
+            __pStartEditDate->SetDate(StartDateTime);
+            __pStartEditTime->SetTime(StartDateTime);
+            String* pDueDateString = static_cast< String* >(pArgs->GetAt(3));	// 3. Profile Due Date
+            DateTime DueDateTime;
+            Tizen::Base::DateTime::Parse(*pDueDateString, DueDateTime);
+            __pDueEditDate->SetDate(DueDateTime);
+            __pDueEditTime->SetTime(DueDateTime);
+            Double* pLatitude = static_cast< Double* >(pArgs->GetAt(4));		// 4. Profile Location(Latitude)
+            Double* pLongitude = static_cast< Double* >(pArgs->GetAt(5));		// 5. Profile Location(Longitude)
+        	String LocationString;
+        	LocationString.Format(50, L"latitude: %.2f, longitude: %.2f", pLatitude->value, pLongitude->value);
+            __pLocationButton->SetText(LocationString);
+            Integer* pVolume = static_cast< Integer* >(pArgs->GetAt(6));		// 6. Profile Volume
+            __pVolumeSlider->SetValue(pVolume->ToInt());
+            Integer* pWifi = static_cast< Integer* >(pArgs->GetAt(7));			// 7. Profile Wifi
+            __pWifiCheckButton->SetSelected(pWifi->ToInt()==1?true:false);
+            String* pMemo = static_cast< String* >(pArgs->GetAt(8));			// 8. Profile Memo
+            String PropertyValue = L"(No description)";
+            if (pMemo != null) {
+                PropertyValue = *pMemo;
+            }
+            __pDescriptionEditField->SetText(PropertyValue);
+            
+            Invalidate(true);
+        }
+        pArgs->RemoveAll(true);
+        delete pArgs;
+    }
 }
 
 void
@@ -492,170 +396,6 @@ EditProfileForm::OnTimeChangeCanceled(const Control& source)
 }
 
 void
-EditProfileForm::LoadProfile(void)
-{
-	// Loads the Subject
-	__pSubjectEditField->SetText(__pProfile->GetSubject());
-
-	// Convert UTC time to local time
-	DateTime startDate = __pProfile->GetStartDate();
-	DateTime dueDate = __pProfile->GetDueDate();
-
-	LocaleManager localeManager;
-	localeManager.Construct();
-
-	TimeZone timeZone = localeManager.GetSystemTimeZone();
-	startDate = timeZone.UtcTimeToWallTime(startDate);
-	dueDate = timeZone.UtcTimeToWallTime(dueDate);
-
-	// Loads the start date
-	__pStartEditDate->SetDate(startDate);
-	__pStartEditTime->SetTime(startDate);
-
-	// Loads the due date
-	__pDueEditDate->SetDate(dueDate);
-	__pDueEditTime->SetTime(dueDate);
-
-	// Loads the Location
-	__pLocationEditField->SetText(__pProfile->GetLocation());
-
-	// Loads the Priority
-	__selectedPriority = __pProfile->GetPriority();
-	switch (__selectedPriority)
-	{
-	case TODO_PRIORITY_LOW:
-		__pPriorityContextButton->SetText(L"Low");
-		break;
-
-	case TODO_PRIORITY_NORMAL:
-		__pPriorityContextButton->SetText(L"Normal");
-		break;
-
-	case TODO_PRIORITY_HIGH:
-		__pPriorityContextButton->SetText(L"High");
-		break;
-
-	default:
-		break;
-	}
-
-	// Loads the Sensitivity
-	__selectedSensitivity = __pProfile->GetSensitivity();
-	switch (__selectedSensitivity)
-	{
-	case SENSITIVITY_PUBLIC:
-		__pSensitivityContextButton->SetText(L"Public");
-		break;
-
-	case SENSITIVITY_PRIVATE:
-		__pSensitivityContextButton->SetText(L"Private");
-		break;
-
-	case SENSITIVITY_CONFIDENTIAL:
-		__pSensitivityContextButton->SetText(L"Confidential");
-		break;
-
-	default:
-		break;
-	}
-
-	// Loads the Status
-	__selectedStatus = __pProfile->GetStatus();
-	switch (__selectedStatus)
-	{
-	case TODO_STATUS_NONE:
-		__pStatusContextButton->SetText(L"None");
-		break;
-
-	case TODO_STATUS_NEEDS_ACTION:
-		__pStatusContextButton->SetText(L"Needs action");
-		break;
-
-	case TODO_STATUS_COMPLETED:
-		__pStatusContextButton->SetText(L"Completed");
-		break;
-
-	case TODO_STATUS_IN_PROCESS:
-		__pStatusContextButton->SetText(L"In process");
-		break;
-
-	case TODO_STATUS_CANCELLED:
-		__pStatusContextButton->SetText(L"Cancelled");
-		break;
-
-	default:
-		break;
-	}
-
-	// Loads the Description
-	__pDescriptionEditField->SetText(__pProfile->GetDescription());
-
-}
-
-result
-EditProfileForm::UpdateProfile(void)
-{
-	result r = E_SUCCESS;
-
-	Calendarbook calendarbook;
-	r = calendarbook.Construct();
-	TryReturn(!IsFailed(r), r, "[%s] Failed to construct the calendarbook.", GetErrorMessage(r));
-
-	// Sets the subject
-	__pProfile->SetSubject(__pSubjectEditField->GetText());
-
-	// Sets the Time zone
-	LocaleManager localeManager;
-	localeManager.Construct();
-
-	TimeZone timeZone = localeManager.GetSystemTimeZone();
-
-	DateTime startDate;
-	DateTime dueDate;
-
-	// Sets the start date
-	startDate.SetValue(__pStartEditDate->GetYear(), __pStartEditDate->GetMonth(), __pStartEditDate->GetDay(), __pStartEditTime->GetHour(), __pStartEditTime->GetMinute(), 0);
-	r = __pProfile->SetStartDate(timeZone.WallTimeToUtcTime(startDate));
-	TryReturn(!IsFailed(r), r, "[%s] Failed to sets the start date.", GetErrorMessage(r));
-
-	// Sets the due date
-	dueDate.SetValue(__pDueEditDate->GetYear(), __pDueEditDate->GetMonth(), __pDueEditDate->GetDay(), __pDueEditTime->GetHour(), __pDueEditTime->GetMinute(), 0);
-	r = __pProfile->SetDueDate(timeZone.WallTimeToUtcTime(dueDate));
-	TryReturn(!IsFailed(r), r, "[%s] Failed to sets the due date.", GetErrorMessage(r));
-
-	// Sets the location
-	__pProfile->SetLocation(__pLocationEditField->GetText());
-
-	// Sets the status
-	__pProfile->SetStatus(__selectedStatus);
-
-	// Sets the Sensitivity
-	__pProfile->SetSensitivity(__selectedSensitivity);
-
-	// Sets the priority
-	__pProfile->SetPriority(__selectedPriority);
-
-	// Sets the description
-	__pProfile->SetDescription(__pDescriptionEditField->GetText());
-
-	r = calendarbook.UpdateTodo(*__pProfile);
-	if (IsFailed(r))
-	{
-		MessageBox messageBox;
-		String getError, getFailUpdate;
-		Application::GetInstance()->GetAppResource()->GetString(IDS_ERROR, getError);
-		Application::GetInstance()->GetAppResource()->GetString(IDS_FAIL_UPDATE, getFailUpdate);
-
-		messageBox.Construct(getError, getFailUpdate, MSGBOX_STYLE_OK, 0);
-		int doModal;
-		messageBox.ShowAndWait(doModal);
-	}
-	TryReturn(!IsFailed(r), r, "[%s] Failed to update Profile.", GetErrorMessage(r));
-
-	return r;
-}
-
-void
 EditProfileForm::CalculateAnchorPosition(Button* pButton, ContextMenu* pContextMenu)
 {
 	int scrollPosition = __pScrollPanel->GetScrollPosition();
@@ -665,4 +405,18 @@ EditProfileForm::CalculateAnchorPosition(Button* pButton, ContextMenu* pContextM
 	contextMenuPoint.y = buttonRectangle.y + CONTEXT_POSITION - scrollPosition;
 
 	pContextMenu->SetAnchorPosition(contextMenuPoint);
+}
+void
+EditProfileForm::OnAdjustmentValueChanged(const Control& source, int adjustment)
+{
+}
+
+void
+EditProfileForm::SetMap(double latitude, double longitude)
+{
+	String mapButtonString;
+	mapButtonString.Format(50, L"latitude: %.2f, longitude: %.2f", latitude, longitude);
+	__latitude = latitude;
+	__longitude = longitude;
+	__pLocationButton->SetText(mapButtonString);
 }

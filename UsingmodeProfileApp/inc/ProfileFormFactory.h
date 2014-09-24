@@ -26,6 +26,18 @@ extern const wchar_t* FORM_CREATION;
 extern const wchar_t* FORM_EDITION;
 extern const wchar_t* FORM_LOCATION;
 
+typedef struct  {
+	Tizen::Base::Integer	index;
+	Tizen::Base::String  	name;
+	Tizen::Base::DateTime 	startDateTime;
+	Tizen::Base::DateTime	dueDateTime;
+	double   	latitude;
+	double	 	longitude;
+	Tizen::Base::Integer 	volume;
+	Tizen::Base::Integer 	wifi;
+	Tizen::Base::String  	memo;
+}_profile_t_;
+
 class ProfileFormFactory
 	: public Tizen::Ui::Scenes::IFormFactory
 {

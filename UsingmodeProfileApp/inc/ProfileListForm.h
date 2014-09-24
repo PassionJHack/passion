@@ -26,7 +26,6 @@
 class ProfileListForm
 	: public Tizen::Ui::Controls::Form
 	, public Tizen::Ui::IActionEventListener
-//	, public Tizen::Social::ICalendarbookEventListener
 	, public Tizen::Ui::Controls::IFormBackEventListener
 	, public Tizen::Ui::Controls::IListViewItemEventListener
 	, public Tizen::Ui::Controls::IListViewItemProvider
@@ -39,21 +38,9 @@ public:
 	virtual ~ProfileListForm();
 
 	bool Initialize(void);
-	void SaveUsingmodeProfile(Tizen::Base::String title, 		int year,
-			int month,
-			int day,
-			int hour,
-			int minute,
-			int year2,
-			int month2,
-			int day2,
-			int hour2,
-			int minute2,
-			double latitude,
-			double longitude,
-			int volume,
-			int wifi,
-			Tizen::Base::String memo);
+
+	void UpdateUsingmodeProfile(_profile_t_ profileSave);
+	void SaveUsingmodeProfile(_profile_t_ profileSave);
 public:
 	virtual result OnInitializing(void);
 	virtual result OnTerminating(void);
@@ -75,21 +62,16 @@ public:
 	virtual void OnCalendarEventsChanged(const Tizen::Base::Collection::IList& eventChangeInfoList){}
 	virtual void OnCalendarTodosChanged(const Tizen::Base::Collection::IList& todoChangeInfoList);
 	virtual void OnListViewItemLongPressed(Tizen::Ui::Controls::ListView& listView, int index, int elementId, bool& invokeListViewItemCallback);
-	virtual void 	OnSettingChanged (Tizen::Base::String &key);
+	virtual void OnSettingChanged(Tizen::Base::String &key);
 private:
 	static const int ID_FOOTER_CREATE = 100;
-    static const int IDA_ITEM_DELETE                = 4001;
-
-	Tizen::Base::Collection::IList* __pProfilesList;
+    static const int IDA_ITEM_DELETE  = 4001;
 
 	Tizen::Ui::Controls::ListView* __pProfileListView;
 	Tizen::Io::Database *__pProfileDatabase;
 
 	Tizen::Base::Collection::ArrayList __pTitleList;
 	Tizen::Base::Collection::ArrayList __pIndexList;
-
-	int __currentIndex;
-    bool __isUpdateMode;
 
     void ListUpdate(void);
 public:

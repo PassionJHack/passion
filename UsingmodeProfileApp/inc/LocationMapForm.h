@@ -60,10 +60,9 @@ public:
 
 private:
 	static const int ID_BUTTON_SELECT = 100;
-	result CreateWebForm();
 	Tizen::Web::Controls::Web* __pWeb;
 	Tizen::Ui::Controls::Footer* pFooter;
-	float x , y;
+	float __latitude , __longitude;
 };
 
 

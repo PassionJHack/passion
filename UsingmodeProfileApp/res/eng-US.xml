@@ -6,7 +6,7 @@
     <text id="IDS_DIALOG_TITLE">Using Mode Profile</text>
     <text id="IDS_DESCRIPTION_GUIDE">Enter the memo</text>
     <text id="IDS_ERROR">Error</text>
-    <text id="IDS_END_DATETIME">End Date and Time</text>
+    <text id="IDS_DUE_DATETIME">Due Date and Time</text>
     <text id="IDS_FAIL_UPDATE">Failed to update Profile.</text>
     <text id="IDS_PROFILE_NAME_ERROR">Please enter the profile name.</text>
     <text id="IDS_FOOTER_CREATE">Profile Create</text>
@@ -24,10 +24,10 @@
     <text id="IDS_EDIT">Edit</text>
     <text id="IDS_DELETE">Delete</text>
     <text id="IDS_PROFILE_NAME">Profile Name</text>
-    <text id="IDS_FAIL_GET">Failed to get Profile</text>
     <text id="IDS_EMPTY_LIST">No Profile</text>
-    <text id="IDS_SAVE">Profile Save</text>
+    <text id="IDS_FAIL_GET">Failed to get Profile</text>
     <text id="IDS_LOCATION">Location</text>
+    <text id="IDS_SAVE">Profile Save</text>
     <text id="IDS_LOCATION_GUIDE">Enter the locaiton</text>
     <text id="IDS_HEADER_TITLE">Phone Usingmode Profile</text>
 </string_table>

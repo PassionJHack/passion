@@ -1,6 +1,5 @@
 #include "AppResourceId.h"
 
-const wchar_t* IDS_ = L"IDS_";
 const wchar_t* IDS_ACCEPT = L"IDS_ACCEPT";
 const wchar_t* IDS_CREATE_TITLE = L"IDS_CREATE_TITLE";
 const wchar_t* IDS_DELETE = L"IDS_DELETE";
@@ -32,8 +31,6 @@ const wchar_t* IDS_SAVE = L"IDS_SAVE";
 const wchar_t* IDS_SELECT = L"IDS_SELECT";
 const wchar_t* IDS_START_ = L"IDS_START_";
 const wchar_t* IDS_START_DATETIME = L"IDS_START_DATETIME";
-const wchar_t* IDS_STRING1 = L"IDS_STRING1";
-const wchar_t* IDS_STRING2 = L"IDS_STRING2";
-const wchar_t* IDS_STRING3 = L"IDS_STRING3";
+
 const wchar_t* IDS_VOLUME = L"IDS_VOLUME";
 const wchar_t* IDS_WIFI = L"IDS_WIFI";

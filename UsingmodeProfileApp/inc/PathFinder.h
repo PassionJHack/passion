@@ -114,7 +114,6 @@ public:
 	virtual void HandleJavaScriptRequestN(Tizen::Web::Json::IJsonValue* pArg);
 	virtual Tizen::Base::String GetName(void);
 private:
-	result CreateWebForm(void);
 	Tizen::Base::String GetValidUrl(Tizen::Base::String& url);
 
 	void SetUrl(const Tizen::Base::String& url);

@@ -28,6 +28,7 @@ class EditProfileForm
 	, public Tizen::Ui::Scenes::ISceneEventListener
 	, public Tizen::Ui::IDateChangeEventListener
 	, public Tizen::Ui::ITimeChangeEventListener
+    , public Tizen::Ui::IAdjustmentEventListener
 {
 
 public:
@@ -51,6 +52,7 @@ public:
 
 	virtual void OnTimeChanged(const Tizen::Ui::Control& source, int hour, int minute);
 	virtual void OnTimeChangeCanceled(const Tizen::Ui::Control& source);
+    virtual void OnAdjustmentValueChanged(const Tizen::Ui::Control& source, int adjustment);
 
 private:
 	void LoadProfile(void);
@@ -59,39 +61,31 @@ void CalculateAnchorPosition(Tizen::Ui::Controls::Button* pButton, Tizen::Ui::Co
 
 private:
 	static const int ID_BUTTON_SAVE = 100;
-	static const int ID_BUTTON_PRIORITY = 200;
-	static const int ID_BUTTON_SENSITIVITY = 201;
-	static const int ID_BUTTON_STATUS = 202;
-	static const int ID_CONTEXT_PRIORITY_HIGH = 300;
-	static const int ID_CONTEXT_PRIORITY_NORMAL = 301;
-	static const int ID_CONTEXT_PRIORITY_LOW = 302;
-	static const int ID_CONTEXT_SENSITIVITY_PUBLIC = 400;
-	static const int ID_CONTEXT_SENSITIVITY_PRIVATE = 401;
-	static const int ID_CONTEXT_SENSITIVITY_CONFIDENTIAL = 402;
-	static const int ID_CONTEXT_STATUS_NONE = 500;
-	static const int ID_CONTEXT_STATUS_NEEDSACTION = 501;
-	static const int ID_CONTEXT_STATUS_COMPLETED = 502;
-	static const int ID_CONTEXT_STATUS_INPROCESS = 503;
-	static const int ID_CONTEXT_STATUS_CANCELLED = 504;
+
+	static const int ID_LOCATION_BUTTON = 200;
+
+	static const int ID_BUTTON_CHECKED   = 101;
+    static const int ID_BUTTON_UNCHECKED = 102;
+    static const int ID_BUTTON_SELECTED  = 103;
 
 	Tizen::Ui::Controls::ScrollPanel* __pScrollPanel;
-	Tizen::Ui::Controls::Button* __pPriorityContextButton;
-	Tizen::Ui::Controls::Button* __pSensitivityContextButton;
-	Tizen::Ui::Controls::Button* __pStatusContextButton;
-	Tizen::Ui::Controls::ContextMenu* __pPriorityTextContextMenu;
-	Tizen::Ui::Controls::ContextMenu* __pSensitivityTextContextMenu;
-	Tizen::Ui::Controls::ContextMenu* __pStatusTextContextMenu;
-	Tizen::Ui::Controls::EditDate* __pStartEditDate;
+    
+    Tizen::Ui::Controls::EditField* __pNameEditField;
+    Tizen::Ui::Controls::EditDate* __pStartEditDate;
 	Tizen::Ui::Controls::EditDate* __pDueEditDate;
 	Tizen::Ui::Controls::EditTime* __pStartEditTime;
 	Tizen::Ui::Controls::EditTime* __pDueEditTime;
-	Tizen::Ui::Controls::EditField* __pSubjectEditField;
-	Tizen::Ui::Controls::EditField* __pLocationEditField;
+	Tizen::Ui::Controls::Button*    __pLocationButton;
+	double __latitude;
+	double __longitude;
 	Tizen::Ui::Controls::EditField* __pDescriptionEditField;
-	Tizen::Social::CalTodo* __pProfile;
-	Tizen::Social::TodoPriority __selectedPriority;
-	Tizen::Social::RecordSensitivity __selectedSensitivity;
-	Tizen::Social::TodoStatus __selectedStatus;
+    
+    Tizen::Ui::Controls::Slider* __pVolumeSlider;
+    Tizen::Ui::Controls::CheckButton* __pWifiCheckButton;
+    int __currentID;
+
+public:
+    void SetMap(double latitude, double longitude);
 
 };
 

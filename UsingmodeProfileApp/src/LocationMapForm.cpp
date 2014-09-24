@@ -11,7 +11,9 @@
 #include "AppResourceId.h"
 #include "LocationMapForm.h"
 #include "CreateProfileForm.h"
+#include "EditProfileForm.h"
 #include "ProfileFormFactory.h"
+#include "SceneRegister.h"
 
 using namespace Tizen::App;
 using namespace Tizen::Base;
@@ -37,7 +39,6 @@ LocationMapForm::Initialize(void)
 
 	r = Construct(FORM_STYLE_NORMAL | FORM_STYLE_FOOTER | FORM_STYLE_PORTRAIT_INDICATOR);
 	TryReturn(!IsFailed(r), false, "[%s] Failed to construct the form.", GetErrorMessage(r));
-	AppLog("aaaa3333");
 
 	return true;
 }
@@ -45,7 +46,6 @@ LocationMapForm::Initialize(void)
 result
 LocationMapForm::OnInitializing(void)
 {
-	AppLog("aaaa1111");
 	result r = E_SUCCESS;
 
 	Footer* pFooter = GetFooter();
@@ -105,12 +105,24 @@ LocationMapForm::OnActionPerformed(const Tizen::Ui::Control& source, int actionI
 	{
 	case ID_BUTTON_SELECT:
 		pSceneManager->GoBackward(BackwardSceneTransition());
-
-		CreateProfileForm *pCreateProfileForm = static_cast< CreateProfileForm* >(Application::GetInstance()->GetAppFrame()->GetFrame()->GetControl(FORM_CREATION));
-		if (pCreateProfileForm != NULL) {
-			pCreateProfileForm->SetMap(this->x, this->y);
-			AppLog("mobilehunter.net test!!!111");
+		Tizen::Ui::Controls::Frame* pFrame = Application::GetInstance()->GetAppFrame()->GetFrame();
+		AppLog("test====1");
+		if (pSceneManager->GetCurrentSceneId().Equals(SCENE_CREATION, true)) {
+			AppLog("test====2");
+			CreateProfileForm *pCreateProfileForm = static_cast< CreateProfileForm* >(pFrame->GetControl(FORM_CREATION));
+			if (pCreateProfileForm != NULL) {
+				pCreateProfileForm->SetMap(this->__latitude, this->__longitude);
+			}
+		} else if (pSceneManager->GetCurrentSceneId().Equals(SCENE_EDITION, true)) {
+			AppLog("test====3");
+			EditProfileForm *pEditProfileForm = static_cast< EditProfileForm* >(pFrame->GetControl(FORM_EDITION));
+			AppLog("test====3-1");
+			if (pEditProfileForm != NULL) {
+				pEditProfileForm->SetMap(this->__latitude, this->__longitude);
+			}
 		}
+		AppLog("test====4");
+
 		break;
 	}
 
@@ -119,17 +131,10 @@ LocationMapForm::OnActionPerformed(const Tizen::Ui::Control& source, int actionI
 void
 LocationMapForm::OnFormBackRequested(Tizen::Ui::Controls::Form& source)
 {
-	AppLog("aaaa");
 	SceneManager* pSceneManager = SceneManager::GetInstance();
 	AppAssert(pSceneManager);
 
 	pSceneManager->GoBackward(BackwardSceneTransition());
-}
-
-result
-LocationMapForm::CreateWebForm()
-{
-
 }
 
 Tizen::Base::String LocationMapForm::GetName (void)
@@ -167,19 +172,10 @@ void  LocationMapForm::HandleJavaScriptRequestN (Tizen::Web::Json::IJsonValue *p
 	 tmpChar3[idx] = '\0';
 	 const wchar_t* tmpChar2 = tmpString2->GetPointer();
 
-	 AppLog("data: %ls \n", tmpChar3);
-	 AppLog("data: %ls \n", tmpChar2);
-
-
-
-	 x.Parse(tmpChar3 , this->x );
-	 y.Parse(tmpChar2 , this->y );
-
-	 AppLog("data: %f \n", this->x);
-	 AppLog("data: %f \n", this->y);
-
-
+	 x.Parse(tmpChar3 , this->__latitude );
+	 y.Parse(tmpChar2 , this->__longitude );
 }
+
 bool
 LocationMapForm::OnHttpAuthenticationRequestedN(const Tizen::Base::String& host, const Tizen::Base::String& realm, const Tizen::Web::Controls::AuthenticationChallenge& authentication)
 {

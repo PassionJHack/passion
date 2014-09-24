@@ -17,11 +17,12 @@
 #include <new>
 #include <FApp.h>
 #include <FSystem.h>
+#include <FMedia.h>
 
 #include "AppResourceId.h"
-#include "ProfileListForm.h"
 #include "SceneRegister.h"
 #include "ProfileFormFactory.h"
+#include "ProfileListForm.h"
 #include "MockLocationListener.h"
 
 using namespace Tizen::App;
@@ -34,19 +35,16 @@ using namespace Tizen::Social;
 using namespace Tizen::Io;
 using namespace Tizen::System;
 
-//static const int LIST_HEIGHT = 112;
-//static const int BUTTON_HEIGHT = 74;
+const wchar_t* SQL_CREATE = L"CREATE TABLE IF NOT EXISTS profile ( profileindex INTEGER PRIMARY KEY, name TEXT, startDateTime TEXT, dueDateTime TEXT, latitude DOUBLE, longitude DOUBLE, volume INTEGER, wifi INTEGER, memo TEXT )";
+const wchar_t* SQL_INSERT = L"INSERT INTO profile(profileindex, name, startDateTime, dueDateTime, latitude, longitude, volume, wifi, memo) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+const wchar_t* SQL_SELECT = L"SELECT name, startDateTime, dueDateTime, latitude, longitude, volume, wifi, memo FROM profile WHERE profileindex = ?";
+const wchar_t* SQL_NAME_LIST = L"SELECT profileindex, name FROM profile";
+const wchar_t* SQL_DELETE = L"DELETE FROM profile WHERE profileindex = ";
+const wchar_t* SQL_UPDATE = L"UPDATE profile SET name = ?, startDateTime = ?, dueDateTime = ?, latitude = ?, longitude = ?, volume = ?, wifi = ?, memo = ? WHERE profileindex = ?";
+
 
 ProfileListForm::ProfileListForm()
-//	: __pProfilesList(null)
-//	, __pCalendarbook(null)
-//	, __selectedStatus(TODO_STATUS_ALL)
-	: __pProfileListView(null)
-	, __isUpdateMode(false)
 {
-    __currentIndex = -1;
-    __pTitleList.Construct();
-    __pIndexList.Construct();
 }
 
 ProfileListForm::~ProfileListForm()
@@ -58,46 +56,18 @@ ProfileListForm::Initialize(void)
 {
 	result r = E_SUCCESS;
 
-
-    String dbName(App::GetInstance()->GetAppDataPath() + L"profile.db");
-
-    __pProfileDatabase = new Database();
-    __pProfileDatabase->Construct(dbName, "a+");
-
-
-//	__pCalendarbook = new Calendarbook();
-//	TryReturn(__pCalendarbook != null, false, "Failed to instantiate calendarbook.");
-//
-//	r = __pCalendarbook->Construct(*this);
-//	if(IsFailed(r))
-//	{
-//		__pCalendarbook->Construct();
-//		__pCalendarbook->GetLatestVersion();
-//		r = GetLastResult();
-//
-//		MessageBox messageBox;
-//
-//		if(r == E_USER_NOT_CONSENTED)
-//		{
-//			messageBox.Construct(L"Error", L"The calendar privacy should be enabled.", MSGBOX_STYLE_OK);
-//		}
-//		else
-//		{
-//			messageBox.Construct(L"Error", L"Failed to construct the calendarbook.", MSGBOX_STYLE_OK);
-//		}
-//
-//		int doModal;
-//		messageBox.ShowAndWait(doModal);
-//
-//		UiApp* pApp = UiApp::GetInstance();
-//		AppAssert(pApp);
-//		pApp->Terminate();
-//	}
-//
-
 	r = Construct(FORM_STYLE_NORMAL | FORM_STYLE_FOOTER | FORM_STYLE_HEADER | FORM_STYLE_PORTRAIT_INDICATOR);
 	TryReturn(!IsFailed(r), false, "[%s] Failed to construct the form.", GetErrorMessage(r));
 	SetName(FORM_LIST);
+
+	// Database : db creation
+	String dbName(App::GetInstance()->GetAppDataPath() + L"profile.db");
+    __pProfileDatabase = new Database();
+    __pProfileDatabase->Construct(dbName, "a+");
+
+	__pProfileListView = null;
+	__pTitleList.Construct();
+    __pIndexList.Construct();
 
 	return true;
 }
@@ -107,70 +77,50 @@ ProfileListForm::OnInitializing(void)
 {
 	result r = E_SUCCESS;
 
-	Header* pHeader = GetHeader();
-	AppAssert(pHeader);
-	pHeader->SetStyle(HEADER_STYLE_TITLE);
-	String getHeaderTitle;
-	Application::GetInstance()->GetAppResource()->GetString(IDS_HEADER_TITLE, getHeaderTitle);
-	pHeader->SetTitleText(getHeaderTitle);
-
-	Footer* pFooter = GetFooter();
-	AppAssert(pFooter);
-	pFooter->SetStyle(FOOTER_STYLE_BUTTON_TEXT);
-
-	FooterItem footerCreate;
-	footerCreate.Construct(ID_FOOTER_CREATE);
-	String getFooterCreate;
-	UiApp::GetInstance()->GetAppResource()->GetString(IDS_FOOTER_CREATE, getFooterCreate);
-	footerCreate.SetText(getFooterCreate);
-	pFooter->AddItem(footerCreate);
-	pFooter->AddActionEventListener(*this);
+	AppResource * pAppResource = Application::GetInstance()->GetAppResource();
+	String resourceString;
 
 	SetFormBackEventListener(this);
 
-	String sql (L"CREATE TABLE IF NOT EXISTS profile(id INTEGER PRIMARY KEY, "
-			"title TEXT, "
-			"year INTEGER, month INTEGER, day INTEGER, hour INTEGER, minute INTEGER, "
-			"year2 INTEGER, month2 INTEGER, day2 INTEGER, hour2 INTEGER, minute2 INTEGER, "
-			"latitude INTEGER, longitude INTEGER, volume INTEGER, wifi INTEGER, memo TEXT)");
-	__pProfileDatabase->ExecuteSql(sql, true);
-    __pTitleList.RemoveAll(true);
-    __pIndexList.RemoveAll(true);
+	// Header
+	Header* pHeader = GetHeader();
+	AppAssert(pHeader);
+	pHeader->SetStyle(HEADER_STYLE_TITLE);
+	pAppResource->GetString(IDS_HEADER_TITLE, resourceString);
+	pHeader->SetTitleText(resourceString);
 
-//    static const int UI_POSITION_GAP = 0;
-
-//	__pStatusContextButton = new (std::nothrow) Button();
-//	__pStatusContextButton->Construct(Rectangle(GetClientAreaBounds().width * 2 / 3, UI_POSITION_GAP, GetClientAreaBounds().width / 3, BUTTON_HEIGHT), L"All");
-//	__pStatusContextButton->SetActionId(ID_BUTTON_STATUS);
-//	__pStatusContextButton->AddActionEventListener(*this);
-//	AddControl(__pStatusContextButton);
-//
-//	__pStatusContextMenu = new (std::nothrow) ContextMenu();
-//	__pStatusContextMenu->Construct(Point(GetClientAreaBounds().width * 5 / 6, BUTTON_HEIGHT * 3), CONTEXT_MENU_STYLE_LIST);
-//	__pStatusContextMenu->AddItem(L"All", ID_CONTEXT_STATUS_ALL);
-//	__pStatusContextMenu->AddItem(L"None", ID_CONTEXT_STATUS_NONE);
-//	__pStatusContextMenu->AddItem(L"Needs action", ID_CONTEXT_STATUS_NEEDS_ACTION);
-//	__pStatusContextMenu->AddItem(L"Completed", ID_CONTEXT_STATUS_COMPLETED);
-//	__pStatusContextMenu->AddItem(L"In process", ID_CONTEXT_STATUS_IN_PROCESS);
-//	__pStatusContextMenu->AddItem(L"Cancelled", ID_CONTEXT_STATUS_CANCELLED);
-//	__pStatusContextMenu->AddActionEventListener(*this);
+	// Footer
+	Footer* pFooter = GetFooter();
+	AppAssert(pFooter);
+	pFooter->SetStyle(FOOTER_STYLE_BUTTON_TEXT);
+	FooterItem footerCreate;
+	footerCreate.Construct(ID_FOOTER_CREATE);
+	pAppResource->GetString(IDS_FOOTER_CREATE, resourceString);
+	footerCreate.SetText(resourceString);
+	pFooter->AddItem(footerCreate);
+	pFooter->AddActionEventListener(*this);
 
 	__pProfileListView = new (std::nothrow) ListView();
-	__pProfileListView->Construct(Rectangle(0 /*UI_POSITION_GAP*/, 0/*BUTTON_HEIGHT*/, GetClientAreaBounds().width, GetClientAreaBounds().height /*- BUTTON_HEIGHT*/));
-	String getNoList;
-	Application::GetInstance()->GetAppResource()->GetString(IDS_EMPTY_LIST, getNoList);
-	__pProfileListView->SetTextOfEmptyList(getNoList);
+	__pProfileListView->Construct(Rectangle(0, 0, GetClientAreaBounds().width, GetClientAreaBounds().height));
+	pAppResource->GetString(IDS_EMPTY_LIST, resourceString);
+	__pProfileListView->SetTextOfEmptyList(resourceString);
 	__pProfileListView->SetItemProvider(*this);
 	__pProfileListView->AddListViewItemEventListener(*this);
 	__pProfileListView->SetSweepEnabled(true);
-
 	AddControl(__pProfileListView);
-	//(*this);
+
+	// Database: SQL Create
+	String sql(SQL_CREATE);
+	r = __pProfileDatabase->ExecuteSql(sql, true);
+	if (IsFailed(r)) {
+		AppLog("DB Creation Fail!!!");
+	}
+    __pTitleList.RemoveAll(true);
+    __pIndexList.RemoveAll(true);
+
 	SettingInfo::AddSettingEventListener(*this);
-
-	ListUpdate();
-
-//	__selectedStatus = TODO_STATUS_ALL;
+	
+    ListUpdate();
 
 	return r;
 }
@@ -179,16 +129,6 @@ result
 ProfileListForm::OnTerminating(void)
 {
 	result r = E_SUCCESS;
-
-//	delete __pCalendarbook;
-//
-//	if (__pProfilesList != null)
-//	{
-//		__pProfilesList->RemoveAll(true);
-//		delete __pProfilesList;
-//	}
-
-//	__pStatusContextMenu->Destroy();
 
 	return r;
 }
@@ -205,67 +145,6 @@ ProfileListForm::OnActionPerformed(const Tizen::Ui::Control& source, int actionI
 	case ID_FOOTER_CREATE:
 		pSceneManager->GoForward(ForwardSceneTransition(SCENE_CREATION));
 		break;
-/*
-	case ID_BUTTON_STATUS:
-		__pStatusContextMenu->SetFocusable(true);
-		__pStatusContextMenu->SetShowState(true);
-		__pStatusContextMenu->Show();
-		break;
-
-	case ID_CONTEXT_STATUS_NONE:
-		__pStatusContextButton->SetText(L"None");
-		__pStatusContextButton->Invalidate(false);
-		__selectedStatus = TODO_STATUS_NONE;
-
-		GetProfileList();
-		__pProfileListView->UpdateList();
-		break;
-
-	case ID_CONTEXT_STATUS_NEEDS_ACTION:
-		__pStatusContextButton->SetText(L"Needs action");
-		__pStatusContextButton->Invalidate(false);
-		__selectedStatus = TODO_STATUS_NEEDS_ACTION;
-
-		GetProfileList();
-		__pProfileListView->UpdateList();
-		break;
-
-	case ID_CONTEXT_STATUS_COMPLETED:
-		__pStatusContextButton->SetText(L"Completed");
-		__pStatusContextButton->Invalidate(false);
-		__selectedStatus = TODO_STATUS_COMPLETED;
-
-		GetProfileList();
-		__pProfileListView->UpdateList();
-		break;
-
-	case ID_CONTEXT_STATUS_IN_PROCESS:
-		__pStatusContextButton->SetText(L"In process");
-		__pStatusContextButton->Invalidate(false);
-		__selectedStatus = TODO_STATUS_IN_PROCESS;
-
-		GetProfileList();
-		__pProfileListView->UpdateList();
-		break;
-
-	case ID_CONTEXT_STATUS_CANCELLED:
-		__pStatusContextButton->SetText(L"Cancelled");
-		__pStatusContextButton->Invalidate(false);
-		__selectedStatus = TODO_STATUS_CANCELLED;
-
-		GetProfileList();
-		__pProfileListView->UpdateList();
-		break;
-
-	case ID_CONTEXT_STATUS_ALL:
-		__pStatusContextButton->SetText(L"All");
-		__pStatusContextButton->Invalidate(false);
-		__selectedStatus = TODO_STATUS_ALL;
-
-		GetProfileList();
-		__pProfileListView->UpdateList();
-		break;
-*/
 	default:
 		break;
 	}
@@ -283,11 +162,7 @@ void
 ProfileListForm::OnListViewItemLongPressed(Tizen::Ui::Controls::ListView& listView, int index, int elementId, bool& invokeListViewItemCallback)
 {
     invokeListViewItemCallback = false;
-    AppLog("OnListViewItemLongPressed.111");
-
-    __currentIndex = index;
-    __isUpdateMode = true;
-    // TODO: should be checked
+    // TODO: should be checked!!
 }
 
 void
@@ -295,69 +170,97 @@ ProfileListForm::OnListViewItemStateChanged(Tizen::Ui::Controls::ListView& listV
 {
 	if (status == LIST_ITEM_STATUS_SELECTED)
 	{
-	    AppLog("OnListViewItemLongPressed.2222");
-
+	    result r= E_SUCCESS;
 	    SceneManager* pSceneManager = SceneManager::GetInstance();
 		AppAssert(pSceneManager);
 
 		ArrayList* pList = new (std::nothrow) ArrayList();
 		pList->Construct();
-	    result r= E_SUCCESS;
-	    __currentIndex = index;
 
 	    DbEnumerator* pEnum;
 	    DbStatement* pStmt;
 
-	    pStmt = __pProfileDatabase->CreateStatementN(L"SELECT title, "
-	    		"year, month, day, hour, minute, "
-	    		"year2, month2, day2, hour2, minute,2 "
-	    				"latitude, longitude, volume, wifi, memo FROM profile WHERE id = ?");
-	    Integer* itemId = static_cast<Integer*>(__pIndexList.GetAt(index));
-	    pList->Add(*new (std::nothrow) Integer(index/**itemId*/));
-	    r = pStmt->BindInt(0, itemId->ToInt());
+	    // Database: SQL select row
+	    pStmt = __pProfileDatabase->CreateStatementN(SQL_SELECT);
+
+	    Integer* profileIndex = static_cast<Integer*>(__pIndexList.GetAt(index));  // index - List Index, profileIndex - Profile Index
+	    r = pStmt->BindInt(0, profileIndex->ToInt());
+
 	    pEnum = __pProfileDatabase->ExecuteStatementN(*pStmt);
 	    if (pEnum) {
-	        String title;
+	    	_profile_t_ selectedProfile;
 	        pEnum->MoveNext();
-	        r = pEnum->GetStringAt(0, title);
-		    pList->Add(*new (std::nothrow) String(title));
-		    int intItem;
-		    double item;
-	        r = pEnum->GetIntAt(1, intItem);	//year
-		    pList->Add(*new (std::nothrow) Integer(intItem));
-	        r = pEnum->GetIntAt(2, intItem);	//month
-		    pList->Add(*new (std::nothrow) Integer(intItem));
-	        r = pEnum->GetIntAt(3, intItem);	//day
-		    pList->Add(*new (std::nothrow) Integer(intItem));
-	        r = pEnum->GetIntAt(4, intItem);	//hour
-		    pList->Add(*new (std::nothrow) Integer(intItem));
-	        r = pEnum->GetIntAt(5, intItem);	//minute
-		    pList->Add(*new (std::nothrow) Integer(intItem));
-	        r = pEnum->GetIntAt(6, intItem);	//year2
-		    pList->Add(*new (std::nothrow) Integer(intItem));
-	        r = pEnum->GetIntAt(7, intItem);	//month2
-		    pList->Add(*new (std::nothrow) Integer(intItem));
-	        r = pEnum->GetIntAt(8, intItem);	//day2
-		    pList->Add(*new (std::nothrow) Integer(intItem));
-	        r = pEnum->GetIntAt(9, intItem);	//hour2
-		    pList->Add(*new (std::nothrow) Integer(intItem));
-	        r = pEnum->GetIntAt(10, intItem);	//minute2
-		    pList->Add(*new (std::nothrow) Integer(intItem));
-	        r = pEnum->GetDoubleAt(11, item);	//latitude
-		    pList->Add(*new (std::nothrow) Double(item));
-	        r = pEnum->GetDoubleAt(12, item);	//longitude
-		    pList->Add(*new (std::nothrow) Double(item));
-	        r = pEnum->GetIntAt(13, intItem);	//volume
-		    pList->Add(*new (std::nothrow) Integer(intItem));
-	        r = pEnum->GetIntAt(14, intItem);	//wifi
-		    pList->Add(*new (std::nothrow) Integer(intItem));
-	        r = pEnum->GetStringAt(15, title);	//memo
-		    pList->Add(*new (std::nothrow) String(title));
+
+	        // 0. Profile Index (Not List Index)
+	        pList->Add(*new (std::nothrow) Integer(*profileIndex));
+
+	        // 1. Profile Name
+	        r = pEnum->GetStringAt(0, selectedProfile.name);
+	        if (r == E_SUCCESS) {
+	        	pList->Add(*new (std::nothrow) String(selectedProfile.name));
+	        } else {
+	        	pList->Add(*new (std::nothrow) String(""));
+	        }
+
+	        // 2. Profile Start Date
+	        r = pEnum->GetDateTimeAt(1, selectedProfile.startDateTime);
+	        if (r == E_SUCCESS) {
+	        	pList->Add(*new (std::nothrow) String(selectedProfile.startDateTime.ToString()));
+	        } else {
+	        	pList->Add(*new (std::nothrow) String(""));
+	        }
+
+	        // 3. Profile Due Date
+	        r = pEnum->GetDateTimeAt(2, selectedProfile.dueDateTime);
+	        if (r == E_SUCCESS) {
+	        	pList->Add(*new (std::nothrow) String(selectedProfile.dueDateTime.ToString()));
+	        } else {
+	        	pList->Add(*new (std::nothrow) String(""));
+	        }
+
+	        // 4. Profile Location(Latitude)
+	        r = pEnum->GetDoubleAt(3, selectedProfile.latitude);
+			AppLog("r[[[[  %.2f  ]]]]]]", selectedProfile.latitude);
+	        if (r == E_SUCCESS) {
+	  		    pList->Add(*new (std::nothrow) Double(selectedProfile.latitude));
+	        } else {
+	        	pList->Add(*new (std::nothrow) Double(0));
+	        }
+
+	        // 5. Profile Location(Longitude)
+	        r = pEnum->GetDoubleAt(4, selectedProfile.longitude);
+	        if (r == E_SUCCESS) {
+	        	pList->Add(*new (std::nothrow) Double(selectedProfile.longitude));
+	        } else {
+	        	pList->Add(*new (std::nothrow) Double(0));
+	        }
+
+	        // 6. Profile Volume
+	        r = pEnum->GetIntAt(5, selectedProfile.volume.value);
+	        if (r == E_SUCCESS) {
+	        	pList->Add(*new (std::nothrow) Integer(selectedProfile.volume));
+	        } else {
+	        	pList->Add(*new (std::nothrow) Integer(0));
+	        }
+
+	        // 7. Profile Wifi
+	        r = pEnum->GetIntAt(6, selectedProfile.wifi.value);
+	        if (r == E_SUCCESS) {
+	        	pList->Add(*new (std::nothrow) Integer(selectedProfile.wifi));
+	        } else {
+	        	pList->Add(*new (std::nothrow) Integer(0));
+	        }
+	        // 8. Profile Memo
+	        r = pEnum->GetStringAt(7, selectedProfile.memo);
+	        if (r == E_SUCCESS) {
+	        	pList->Add(*new (std::nothrow) String(selectedProfile.memo));
+	        } else {
+	        	pList->Add(*new (std::nothrow) String(""));
+	        }
 	        delete pEnum;
 	    }
 	    delete pStmt;
 		pSceneManager->GoForward(ForwardSceneTransition(SCENE_DETAIL), pList);
-	    __isUpdateMode = true;
 	}
 }
 
@@ -370,32 +273,34 @@ void
 ProfileListForm::OnListViewContextItemStateChanged(Tizen::Ui::Controls::ListView& listView, int index, int elementId, Tizen::Ui::Controls::ListContextItemStatus state)
 {
     if (elementId == IDA_ITEM_DELETE) {
-    	DeleteProfile(index);
+    	Integer* itemId = static_cast<Integer*>(__pIndexList.GetAt(index));
+    	DeleteProfile(itemId->value);
     }
 }
+
 bool
 ProfileListForm::DeleteProfile(int index)
 {
-    AppLog("State Changed!!!! - 2");
-    MessageBox msgbox;
     String getDeleteProfileMsg, getDialogTitle;
-    Application::GetInstance()->GetAppResource()->GetString(IDS_DELETE_PROFILE, getDeleteProfileMsg);
-    Application::GetInstance()->GetAppResource()->GetString(IDS_DIALOG_TITLE, getDialogTitle);
-    msgbox.Construct(getDialogTitle, getDeleteProfileMsg, MSGBOX_STYLE_YESNO, 3000);
+	AppResource * pAppResource = Application::GetInstance()->GetAppResource();
+	pAppResource->GetString(IDS_DELETE_PROFILE, getDeleteProfileMsg);
+	pAppResource->GetString(IDS_DIALOG_TITLE, getDialogTitle);
+
     int modalResult = 0;
+
+    MessageBox msgbox;
+    msgbox.Construct(getDialogTitle, getDeleteProfileMsg, MSGBOX_STYLE_YESNO, 3000);
     msgbox.ShowAndWait(modalResult);
     switch(modalResult){
     case MSGBOX_RESULT_YES:
         {
-            String sql;
-            sql.Append(L"DELETE FROM profile WHERE id = ");
-            Integer* itemId = static_cast<Integer*>(__pIndexList.GetAt(index));
-            sql.Append(itemId->ToInt());
+        	// Database: SQL Delete row
+            String sql(SQL_DELETE);
+            sql.Append(index);
             __pProfileDatabase->BeginTransaction();
             __pProfileDatabase->ExecuteSql(sql, true);
             __pProfileDatabase->CommitTransaction();
             ListUpdate();
-            __isUpdateMode = false;
         }
         return true;
     }
@@ -416,7 +321,6 @@ ProfileListForm::GetItemCount(void)
 Tizen::Ui::Controls::ListItemBase*
 ProfileListForm::CreateItem(int index, int itemWidth)
 {
-
 	SimpleItem* pItem = new SimpleItem();
 	AppAssert(pItem);
 
@@ -425,9 +329,9 @@ ProfileListForm::CreateItem(int index, int itemWidth)
     String *str = static_cast<String*>(__pTitleList.GetAt(index));
     pItem->SetElement(*str, null);
 
-    ListContextItem* pContextItem = new ListContextItem();
 	String getDelete;
 	Application::GetInstance()->GetAppResource()->GetString(IDS_DELETE, getDelete);
+    ListContextItem* pContextItem = new ListContextItem();
     pContextItem->Construct();
     pContextItem->AddElement(IDA_ITEM_DELETE, getDelete);
     pItem->SetContextItem(pContextItem);
@@ -470,7 +374,7 @@ ProfileListForm::ListUpdate(void)
     __pIndexList.RemoveAll(true);
 
     DbEnumerator* pEnum;
-    pEnum = __pProfileDatabase->QueryN(L"SELECT id, title FROM profile");
+    pEnum = __pProfileDatabase->QueryN(SQL_NAME_LIST);
     if (pEnum) {
         while(pEnum->MoveNext() == E_SUCCESS) {
             pEnum->GetIntAt(0, id);
@@ -487,87 +391,68 @@ ProfileListForm::ListUpdate(void)
 }
 
 void
-ProfileListForm::SaveUsingmodeProfile(Tizen::Base::String title,
-		int year,
-		int month,
-		int day,
-		int hour,
-		int minute,
-		int year2,
-		int month2,
-		int day2,
-		int hour2,
-		int minute2,
-		double latitude,
-		double longitude,
-		int volume,
-		int wifi,
-		Tizen::Base::String memo)
+ProfileListForm::UpdateUsingmodeProfile(_profile_t_ profileSave)
 {
-	AppLog("%s, %s", title.GetPointer(), memo.GetPointer());
-
     DbStatement* pStmt;
     DbEnumerator* pEnum;
-    long long id;
-
-    Tizen::System::SystemTime::GetTicks(id);
     __pProfileDatabase->BeginTransaction();
 
-    if (__isUpdateMode) {
-        pStmt = __pProfileDatabase->CreateStatementN(L"UPDATE profile SET title = ?, "
-        		"year = ?, month = ?, day = ?, hour = ?, minute = ?, "
-        		"year2 = ?, month2 = ?, day2 = ?, hour2 = ?, minute2 = ?, "
-        		"latitude = ?, longitude = ?, volume = ?, wifi = ?, memo = ? WHERE id = ?");
-        pStmt->BindString(0, title);
-        pStmt->BindInt(1, year);
-        pStmt->BindInt(2, month);
-        pStmt->BindInt(3, day);
-        pStmt->BindInt(4, hour);
-        pStmt->BindInt(5, minute);
-        pStmt->BindInt(6, year);
-        pStmt->BindInt(7, month);
-        pStmt->BindInt(8, day);
-        pStmt->BindInt(9, hour);
-        pStmt->BindInt(10, minute);
-        pStmt->BindDouble(11, latitude);
-        pStmt->BindDouble(12, longitude);
-        pStmt->BindInt(13, volume);
-        pStmt->BindInt(14, wifi);
-        pStmt->BindString(15, memo);
-        Integer* itemId = static_cast<Integer*>(__pIndexList.GetAt(__currentIndex));
-        pStmt->BindInt(16, itemId->ToInt());
-        __isUpdateMode = false;
-    } else {
-        AppLog("Normal Save");
-        pStmt = __pProfileDatabase->CreateStatementN(L"INSERT INTO profile (id, title, "
-        		"year, month, day, hour, minute, "
-        		"year2, month2, day2, hour2, minute2, "
-        				"latitude, longitude, volume, wifi, memo) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        pStmt->BindInt(0, id);
-        pStmt->BindString(1, title);
-        pStmt->BindInt(2, year);
-        pStmt->BindInt(3, month);
-        pStmt->BindInt(4, day);
-        pStmt->BindInt(5, hour);
-        pStmt->BindInt(6, minute);
-        pStmt->BindInt(7, year2);
-        pStmt->BindInt(8, month2);
-        pStmt->BindInt(9, day2);
-        pStmt->BindInt(10, hour2);
-        pStmt->BindInt(11, minute2);
-        pStmt->BindDouble(12, latitude);
-        pStmt->BindDouble(13, longitude);
-        pStmt->BindInt(14, volume);
-        pStmt->BindInt(15, wifi);
-        pStmt->BindString(16, memo);
-    }
-    pEnum = __pProfileDatabase->ExecuteStatementN(*pStmt);
-    __pProfileDatabase->CommitTransaction();
+	// Database: SQL Update row
+	pStmt = __pProfileDatabase->CreateStatementN(SQL_UPDATE);
+	if (pStmt != null) {
+		AppLog("u[[[[  %.2f  ]]]]]]", profileSave.latitude);
+		pStmt->BindString(0, profileSave.name);
+		pStmt->BindString(1, profileSave.startDateTime.ToString());
+		pStmt->BindString(2, profileSave.dueDateTime.ToString());
+		pStmt->BindDouble(3, profileSave.latitude);
+		pStmt->BindDouble(4, profileSave.longitude);
+		pStmt->BindInt(5, profileSave.volume.ToInt());
+		pStmt->BindInt(6, profileSave.wifi.ToInt());
+		pStmt->BindString(7, profileSave.memo);
+		pStmt->BindInt(8, profileSave.index.ToInt());
 
-    delete pStmt;
-    delete pEnum;
+		pEnum = __pProfileDatabase->ExecuteStatementN(*pStmt);
+		__pProfileDatabase->CommitTransaction();
+
+		delete pStmt;
+	    delete pEnum;
+	}
+
     ListUpdate();
 }
+
+void
+ProfileListForm::SaveUsingmodeProfile(_profile_t_ profileSave)
+{
+    DbStatement* pStmt;
+    DbEnumerator* pEnum;
+    __pProfileDatabase->BeginTransaction();
+
+	// Datebase: SQL Insert row
+	pStmt = __pProfileDatabase->CreateStatementN(SQL_INSERT);
+	if (pStmt != null) {
+		AppLog("s[[[[  %.2f  ]]]]]]", profileSave.latitude);
+		pStmt->BindInt(0, profileSave.index.ToInt());
+		pStmt->BindString(1, profileSave.name);
+		pStmt->BindString(2, profileSave.startDateTime.ToString());
+		pStmt->BindString(3, profileSave.dueDateTime.ToString());
+		pStmt->BindDouble(4, profileSave.latitude);
+		pStmt->BindDouble(5, profileSave.longitude);
+		pStmt->BindInt(6, profileSave.volume.ToInt());
+		pStmt->BindInt(7, profileSave.wifi.ToInt());
+		pStmt->BindString(8, profileSave.memo);
+
+		pEnum = __pProfileDatabase->ExecuteStatementN(*pStmt);
+		__pProfileDatabase->CommitTransaction();
+
+		delete pStmt;
+		delete pEnum;
+	}
+    AppLog("-------end");
+
+    ListUpdate();
+}
+
 
 void
 ProfileListForm::OnSettingChanged (Tizen::Base::String &key)
@@ -583,6 +468,5 @@ ProfileListForm::OnSettingChanged (Tizen::Base::String &key)
 	        AppLog("volume2");
 	        pMockLocationListner->StartApp();
 	}
-
 
 }
